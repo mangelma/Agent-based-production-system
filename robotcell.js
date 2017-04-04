@@ -13,8 +13,8 @@ var app = require('express')();
 var bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-var fastIP = '192.168.1.150'
-var myIP = '192.168.1.129' // komentoriville ipconfig
+var fastIP = 'http://192.168.1.150'
+var myIP = 'http://192.168.1.129' // komentoriville ipconfig
 var serverBacePort = 4000 // bace port plus cellnumber
 
 
@@ -31,6 +31,7 @@ var Robotcell = function Robotcell(place, job) {
 };
 Robotcell.prototype.CreateServer = function(place)
 {
+    /*
     app.post('/', function(req, res){
         console.log("POST received with body of ");
         console.log(req.body);
@@ -45,6 +46,8 @@ Robotcell.prototype.CreateServer = function(place)
         res.end('yes this is ANTTI');
         console.log("get received \n");
     });
+*/
+    var server = http.createServer(handleRequest);
 
     http.listen(serverBacePort+place, function(){
         console.log('The ANTTI is listening in 4001');
@@ -70,9 +73,10 @@ Robotcell.prototype.SubscribeToCell = function (place)
 
 Robotcell.prototype.GetPalletInformation = function ()
 {
-    var ip = fastIP +':4001'
+
+
     var options = {
-        uri: ip,
+        uri: fastIP+':4007',
         method: 'POST',
         json: {
             "id" : "123456"
@@ -115,7 +119,7 @@ Robotcell.prototype.UpdatePalletInformation = function () {
 // muuttaa palletin reseptiä ja destinatiota
 
         var options = {
-            uri: fastIP+':4001',
+            uri: fastIP+':4007',
             method: 'POST',
             json: {
                 "order": "[10 , 2, 3, 4, 5, 6]"
@@ -165,7 +169,8 @@ Robotcell.prototype.SendCellInfomation = function () {
 var john = new Robotcell(1,'1');
 
 //john.UpdatePalletInformation();
-john.GetPalletInformation();
+//john.GetPalletInformation();
+john.CreateServer();
 
 // Stating computations
 //var theResult = g.find("green", []);
