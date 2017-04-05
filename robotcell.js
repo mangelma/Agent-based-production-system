@@ -15,7 +15,7 @@ var serverBasePort = 4000 // Base port plus cellnumber
 
 
 var Robotcell = function Robotcell(place, job) {
-    this._place = place;
+    this.place = place;
     this.job = job;
     this.penColor = 'unknown';
     this.state = 'idle';
@@ -24,46 +24,68 @@ var Robotcell = function Robotcell(place, job) {
     this.port = 1234;
     this.url = "127.0.0.1";
 };
-Robotcell.prototype.CreateServer = function(place)
+Robotcell.prototype.RunServer = function()
 {
-    /*
-    app.post('/', function(req, res){
-        console.log("POST received with body of ");
-        console.log(req.body);
-        res.write("oh snap");
-        res.end('post ok');
+    port = this.place+serverBasePort
+    console.log(port)
+    var ref = this;
+
+    var myServer = http.createServer(function(req, res) {
+        var method = req.method;
+        //console.log(..your message..) - can be used in many places for the debugging peurposes.
+        console.log("Method: " + method);
+
+        if(method == 'GET'){
+            //Handle GET method.
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'text/plain');
+            res.end('Agent ' + ref._name + ' is running.');
+        } else if(method == 'POST'){
+            //Handle POST method.
+            var body = []; //Getting data: https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
+            req.on('data', function(chunk) {
+                body.push(chunk);
+                console.log("Body???: " + body.toString());
+                //Handle request.
+                //... ref.makeRequest(...);
+                //Parse the body
+                //1. Separate three elements of cap., whoAsked and path
+
+                res.end("OK"); //Avoid sender waiting for a reply.
+
+
+            });
+
+        }
     });
 
-    app.get('/', function(req, res){
-        //Handle GET method.
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        res.end('yes this is ANTTI');
-        console.log("get received \n");
-    });
-*/
-    var server = http.createServer(handleRequest);
-
-    http.listen(serverBasePort+place, function(){
-        console.log('The ANTTI is listening in 4001');
-        console.log('\n');
-    });
-
+    myServer.listen(port, "127.0.0.1", () => {
+        console.log('Agent server ' + ref._name + ' is running at http://127.0.0.1:' + port);
+});
 }
-Robotcell.prototype.SubscribeToCell = function (place)
+Robotcell.prototype.SubscribeToCell = function (robcon,funktion)
 {
+
+    port = this.place+serverBasePort
+
     var options = {
-        uri: fastIP+':3000/RTU/CNV8/events/Z1_Changed/notifs',
+        uri: fastIP + ':3000/RTU/Sim'+robcon+ this.place + '/events/Z1_Changed/notifs',
         method: 'POST',
-        json: {"destUrl":"192.168.1.129"}
+        json: {"destUrl": myIP+':'+port}
     };
+    console.log(fastIP + ':3000/RTU/'+robcon+ this.place + '/events/Z1_Changed/notifs')
+    console.log("destUrl :"+ myIP+':'+port)
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             //console.log(body.id) // Print the shortened url.
         }
-        console.log(error)
-
+        console.log('error ='+error)
+        console.log(body)
+        console.log('subscriped to '+funktion)
     });
+
+
+
 }
 
 Robotcell.prototype.GetPalletInformation = function ()
@@ -161,11 +183,14 @@ Robotcell.prototype.SendCellInfomation = function () {
 
 
 //*** Class definition done. We can start with objects
-var john = new Robotcell(1,'1');
+
+var john = new Robotcell(8,'1');
 
 //john.UpdatePalletInformation();
 //john.GetPalletInformation();
-john.CreateServer();
+john.RunServer();
+john.SubscribeToCell('CNV','Z1_Changed')
+
 
 // Stating computations
 //var theResult = g.find("green", []);
