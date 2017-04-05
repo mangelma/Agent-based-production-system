@@ -87,8 +87,12 @@ app.post('/', function(req, res){
 
     // vastataan antille
     if (req.body.id != "PalletLoaded") {
-        //pallet = req.body.id;
-        res.write("Hei antti");
+        console.log(req.body);
+        console.log(req.body.palletInfo);
+        //var askedPalletId = req.body.palletInfo;
+        //console.log(askedPalletId);
+        res.write("Hei ANTTI, ID jolta kysyit: ");
+        res.write(req.body.palletInfo);
 
         // Pallet loaded event
     } else if (req.body.payload.PalletID) {
@@ -98,7 +102,7 @@ app.post('/', function(req, res){
     } else {
         res.write("oh snap");
     }
-    res.end('post ok');
+    res.end('\n Information Exhange Sequence End');
 });
 
 
