@@ -11,31 +11,27 @@ app.use(bodyParser.json());
 var LoadingCell = function LoadingCell() {
     this.place = 7;
     this.job = 4; // 1 screen, 2 keyboard, 3 frame, 4 load/unload, 5 paper in/out
-    // PalletID tallennetaan WS7:lle loadin yhteydessä, luodaan olio ja annetaan portti
-    // WS7 pitää palleteista kirjaa JSON-muodossa
-    // pseudoJSON:  { "1491310731396" : {"port":  "4002", "recipe" : "1, 2, 3", "destination" : "5"}
-    //                  "1491310731397" : "4003" }
     this.palletDict = [];
 };
-
 
 var Pallet = function Pallet(id, port) {
     this.id = id;
     // frame, framecolor, screen, screencolor, keyboard, kbcolor
     //this.recipe = recipe;
-    //this.destination = destination;
-    // portti on 4100 + WS7.palletDict.indexOf(palletid);
     this.port = 4100+port;
-    //this.url = "127.0.0.1";
 };
 
 Pallet.prototype.printAll = function () {
-    console.log("Printing pallet information");
+    console.log("PRINTALL");
     console.log("ID: " + this.id);
     console.log("Port: " + this.port);
 };
 
 var WS7 = new LoadingCell();
+var palikka =  new Pallet(1234, 1234);
+palikka.printAll();
+//var String(1234) = new Pallet(3456, 1232);
+//String(1234).printAll();
 
 LoadingCell.prototype.getPalletJSON = function () {
     //console.log("printing json from agent json");
@@ -44,26 +40,33 @@ LoadingCell.prototype.getPalletJSON = function () {
 };
 
 LoadingCell.prototype.init = function() {
-    console.log("WS7 initialized with 123456 as first id in array");
-    this.palletDict[0] = 123456;
+    //console.log("WS7 initialized with 123456 as first id in array");
+    //this.palletDict[0] = 123456;
 };
 
 // setter
 LoadingCell.prototype.updatePalletJSON = function (iidee) {
+
+    iidee = iidee.toString();
+
     if (this.palletDict.indexOf(iidee) == -1) {
         console.log("New PalletID " + iidee + ", pushing it to array")
-        this.palletDict.push(iidee);
+
         var print = this.getPalletJSON();
         console.log("Pallet Array: " + print);
         //console.log("Length of array is : " + this.palletDict.length);
         //var newName = "Pallet" + this.palletDict.length;
-        var newName = iidee;
+       // var n = num.toString();
+        //n = new Pallet(1234, 10);
+        //.printAll();
         var portsuffix = this.palletDict.length;
         //console.log(newName);
-        newName = new Pallet(iidee, portsuffix);
-        newName.printAll();
+        iidee = new Pallet(iidee, portsuffix);
+        console.log(iidee);
+        this.palletDict.push(iidee);
+        iidee.printAll();
     } else {
-        console.log("Same event received multiple times, not pushing to array");
+        //console.log("Same event received multiple times, not pushing to array");
     }
 };
 
@@ -138,23 +141,36 @@ function subscribeToEvents() {
 } // end of subscribe
 
 function logJSON() {
+    console.log("DEBUG JSON FUNCTION IOT IOT IOT DASD DASD");
+    var palletArray = WS7.getPalletJSON();
 
-    //console.log("\n DEBUG JSON FUNCTION IOT IOT IOT DASD DASD");
+    for (var i = 0; i < palletArray.length; i++) {
+        //console.log(palletArray[i].toString());
+        //var thisId = palletArray[i].toString();
+        var thisId = palletArray[i];
+        //console.log(thisId);
 
-    var print = WS7.getPalletJSON();
+        //console.log("Type of thisid " + typeof thisId);
+        //console.log("Type of palletarray[i] " + typeof palletArray[i]);
 
-    console.log("Pallet Array: " + print);
-    //console.log(print.length);
+        //console.log("Index of " + thisId + " in palletarray: " + palletArray.indexOf(thisId));
+        //console.log(WS7.getPalletJSON());
+        //console.log("Testipalikka: " + palikka);
+        //console.log("Palikka.printAll: ");
+        //palikka.printAll();
+        console.log("Information about: " + thisId.id);
+        console.log("Index in palletarray: " + palletArray.indexOf(thisId));
+        thisId.printAll();
+        //console.log(Pallet.keys(thisId));
+    }
+
+    //console.log(['123456'].printAll());
 
    // console.log("Stringified: " + JSON.stringify(print));
-
     //console.log("Whole JSON " + print);
-
     // "1491319248646"
-
-   // console.log("Only test id: " + print['123456']);
+    //console.log("Only test id: " + print[0]);
     //console.log("Only 1491319248646: " + JSON.stringify(print['1491319248646']));
-
     //console.log(JSON.stringify(WS7.getPalletJSON()));
 } // end of debugging log
 
@@ -173,4 +189,4 @@ app.get('/', function(req, res){
 });
 
 subscribeToEvents();
-//setInterval(logJSON, 5000);
+setInterval(logJSON, 5000);
