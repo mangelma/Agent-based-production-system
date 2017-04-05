@@ -1,24 +1,11 @@
+// Created by Max Angelma on 5.4.2017
+
 var app = require('express')();
 var http = require('http').Server(app);
 var request = require('request');
-var bodyParser = require('body-parser')
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
-//ksojwrjgoasjgoa
-
-
-/*
-var Pallet = function Pallet(id, recipe, destination) {
-
-    this._id = id;
-
-    // frame, framecolor, screen, screencolor, keyboard, kbcolor
-    this.recipe = recipe;
-    this.destination = destination;
-    this.port = 1234;
-    this.url = "127.0.0.1";
-};
-*/
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Agentti WS7
 var LoadingCell = function LoadingCell() {
@@ -31,9 +18,25 @@ var LoadingCell = function LoadingCell() {
     this.palletDict = [];
 };
 
+
+var Pallet = function Pallet(id, port) {
+    this.id = id;
+    // frame, framecolor, screen, screencolor, keyboard, kbcolor
+    //this.recipe = recipe;
+    //this.destination = destination;
+    // portti on 4100 + WS7.palletDict.indexOf(palletid);
+    this.port = 4100+port;
+    //this.url = "127.0.0.1";
+};
+
+Pallet.prototype.printAll = function () {
+    console.log("Printing pallet information");
+    console.log("ID: " + this.id);
+    console.log("Port: " + this.port);
+};
+
 var WS7 = new LoadingCell();
 
-// getter
 LoadingCell.prototype.getPalletJSON = function () {
     //console.log("printing json from agent json");
     //console.log(this.palletDict);
@@ -41,21 +44,32 @@ LoadingCell.prototype.getPalletJSON = function () {
 };
 
 LoadingCell.prototype.init = function() {
+    console.log("WS7 initialized with 123456 as first id in array");
     this.palletDict[0] = 123456;
 };
 
 // setter
 LoadingCell.prototype.updatePalletJSON = function (iidee) {
-    console.log("pushing..." + iidee);
-    console.log("index is " + this.palletDict.indexOf(iidee));
     if (this.palletDict.indexOf(iidee) == -1) {
+        console.log("New PalletID " + iidee + ", pushing it to array")
         this.palletDict.push(iidee);
+        var print = this.getPalletJSON();
+        console.log("Pallet Array: " + print);
+        //console.log("Length of array is : " + this.palletDict.length);
+        //var newName = "Pallet" + this.palletDict.length;
+        var newName = iidee;
+        var portsuffix = this.palletDict.length;
+        //console.log(newName);
+        newName = new Pallet(iidee, portsuffix);
+        newName.printAll();
+    } else {
+        console.log("Same event received multiple times, not pushing to array");
     }
 };
 
 // POST message handling
 app.post('/', function(req, res){
-    console.log("POST received with body of ");
+    //console.log("POST received with body of ");
     //console.log(req.body);
 
     // vastataan antille
@@ -65,23 +79,18 @@ app.post('/', function(req, res){
 
         //res.write("Hei antti");
         //res.write( JSON.stringify( WS7.getPalletJSON() ) );
-
         //res.write(WS7.getPalletJSON.pallet);
 
         // Pallet loaded event
     } else if (req.body.payload.PalletID) {
 
         var key = req.body.payload.PalletID;
-        console.log(key);
+        //console.log(key);
         //console.log(req.body.payload.PalletID);
-
         // format jason here
         //var jason = '{"' + key + '" : {"recipe" : [0, 0, 0, 0, 0, 0], "destination" : "0" }} ';
-
         //console.log("Text jason: " + jason);
-
         //var parsed = JSON.parse(jason);
-
         //console.log("Parsed jason: " + parsed);
 
         WS7.updatePalletJSON(key);
@@ -95,20 +104,6 @@ app.post('/', function(req, res){
     res.end('post ok');
 });
 
-// GET message handling
-app.get('/', function(req, res){
-    //Handle GET method.
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('yes this is pallet');
-    console.log("get received \n");
-});
-
-// pallet kuuntelee 3001
-http.listen(4007, function(){
-    console.log('The Agent WS7 is listening in 4001');
-    console.log('\n');
-});
 
 function changeRecipe() {
     first++;
@@ -131,111 +126,24 @@ function changeRecipe() {
 // HUOM
 
 function subscribeToEvents() {
-
+    // initialize also the WS7 here
     WS7.init();
-
-    /*
-    console.log("Subscribed to paperloaded");
-    var options = {
-        uri: 'http://localhost:3000/RTU/ROB1/events/PaperLoaded/notifs',
-        method: 'POST',
-        json: {"destUrl":"http://localhost:4001"}
-    };
-    request(options, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            //console.log(body.id) // Print the shortened url.
-        } else {
-            console.log(error);
-        }
-    }); */
-
-    console.log("Subscribed!");
+    console.log("Subscribed to PalletLoaded!");
     request.post('http://localhost:3000/RTU/SimROB7/events/PalletLoaded/notifs',
         {form:{destUrl:"http://localhost:4007"}}, function(err,httpResponse,body){
         //console.log(err);
         console.log(body);
         //console.log(httpResponse);
         });
-}
-
-/*
-Pallet.prototype.runServer = function (port) {
-    this.port = port;
-    var ref = this;
-
-    var myServer = http.createServer(function(req, res) {
-        var method = req.method;
-        //console.log(..your message..) - can be used in many places for the debugging peurposes.
-        console.log("Method: " + method);
-
-        // selaindebuggausta varten jotain
-        if(method == 'GET'){
-            //Handle GET method.
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'text/plain');
-            res.end('Pallet ' + ref._id + ' with recipe ' + ref.recipe);
-
-            // POSTilla tilaus sisään
-        } else if(method == 'POST'){
-            console.log(req.body);
-            //Handle POST method.
-            var body = []; //Getting data: https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
-            req.on('data', function(chunk) {
-               body.push(chunk);
-                //console.log(body.toString());
-                console.log(body);
-                console.log(body.toString());
-                var elem = body.toString().split(";");
-                console.log(elem);
-                res.end("OK"); //Avoid sender waiting for a reply.
-
-            });
-        }
-    });
-
-    myServer.listen(port, "127.0.0.1", () => {
-        console.log('Agent server ' + ref._name + ' is running at http://127.0.0.1:' + port);
-});
-};
-
-a.runServer(3001);
-*/
-/* SUBSCRIBE EVENTTEIHIN TÄLLÄ
-Person.prototype.makeRequest = function (whoToAsk, req) {
-
-    var options = {
-        method: 'post',
-        body: req, // Javascript object
-        url: "http://127.0.0.1:" + whoToAsk,
-        headers: {
-            'Content-Type': 'text/plain'
-        }
-    };
-
-    //Print the result of the HTTP POST request
-    request(options, function (err, res, body) {
-        if (err) {
-            console.log('Error :', err);
-            return;
-        }
-        console.log(body);
-        //Process response
-        //res.write("OK");
-        //    res.end("OK");
-    });
-
-};
-*/
-
-subscribeToEvents();
+} // end of subscribe
 
 function logJSON() {
 
-    console.log("\n DEBUG JSON FUNCTION IOT IOT IOT DASD DASD");
+    //console.log("\n DEBUG JSON FUNCTION IOT IOT IOT DASD DASD");
 
     var print = WS7.getPalletJSON();
 
-    console.log(print);
+    console.log("Pallet Array: " + print);
     //console.log(print.length);
 
    // console.log("Stringified: " + JSON.stringify(print));
@@ -248,10 +156,21 @@ function logJSON() {
     //console.log("Only 1491319248646: " + JSON.stringify(print['1491319248646']));
 
     //console.log(JSON.stringify(WS7.getPalletJSON()));
-}
+} // end of debugging log
 
-setInterval(logJSON, 5000);
-// create Workcell 7 which loads the pallets
 
-//setInterval(printRecipe, 15000);
-//setInterval(changeRecipe, 5000);
+http.listen(4007, function(){
+    console.log('The Agent WS7 is listening in 4001');
+    console.log('\n');
+});
+
+// GET message handling, if we want to show something on the browser
+app.get('/', function(req, res){
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('yes this is pallet');
+    console.log("get received \n");
+});
+
+subscribeToEvents();
+//setInterval(logJSON, 5000);

@@ -1,11 +1,6 @@
 /**
  * Created by Antti on 4.4.2017.
  */
-/**
- * Created by Andrei Lobov on 15/02/2017.
- *
- * Communicating persons example...
- */
 var http = require('http');
 var request = require('request');
 var express = require('express');
@@ -15,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 var fastIP = 'http://192.168.1.150'
 var myIP = 'http://192.168.1.129' // komentoriville ipconfig
-var serverBacePort = 4000 // bace port plus cellnumber
+var serverBasePort = 4000 // Base port plus cellnumber
 
 
 
@@ -49,7 +44,7 @@ Robotcell.prototype.CreateServer = function(place)
 */
     var server = http.createServer(handleRequest);
 
-    http.listen(serverBacePort+place, function(){
+    http.listen(serverBasePort+place, function(){
         console.log('The ANTTI is listening in 4001');
         console.log('\n');
     });
@@ -142,7 +137,7 @@ Robotcell.prototype.GetCellStates = function () {
 }
 // kysyy kaikilta soluita (state, stack, pencolor, job
 
-Robotcell.prototype.DesideNextPalletDestinaton = function () {
+Robotcell.prototype.DecideNextPalletDestinaton = function () {
 
 }
 //päätä getcellstate tietojen pohjalta mihin pallet menee seuraavaksi
