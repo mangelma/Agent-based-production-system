@@ -22,14 +22,13 @@ var Pallet = function Pallet(id, port) {
 };
 
 Pallet.prototype.printAll = function () {
-    console.log("PRINTALL");
-    console.log("ID: " + this.id);
-    console.log("Port: " + this.port);
+    //console.log("PRINTALL");
+    console.log("ID: " + this.id + " Port: " + this.port);
 };
 
 var WS7 = new LoadingCell();
-var palikka =  new Pallet(1234, 1234);
-palikka.printAll();
+//var palikka =  new Pallet(1234, 1234);
+//palikka.printAll();
 //var String(1234) = new Pallet(3456, 1232);
 //String(1234).printAll();
 
@@ -44,30 +43,60 @@ LoadingCell.prototype.init = function() {
     //this.palletDict[0] = 123456;
 };
 
-// setter
 LoadingCell.prototype.updatePalletJSON = function (iidee) {
 
-    iidee = iidee.toString();
 
+
+    var palletArray = this.getPalletJSON();
+
+    var arrayLength = palletArray.length;
+
+    for (var i = 0; i < arrayLength; i++) {
+        var thisId = palletArray[i];
+        console.log("Information about: " + thisId.id);
+        console.log("Index in palletarray: " + palletArray.indexOf(thisId));
+
+        // jos ei löydy, push
+        if (this.palletDict.indexOf(this.id) == -1) {
+            console.log("New PalletID " + iidee + ", pushing it to array");
+            var portsuffix = arrayLength;
+            iidee = new Pallet(iidee.toString(), portsuffix);
+            //console.log(iidee);
+            this.palletDict.push(iidee);
+        } else {
+            console.log("multiple events");
+        }
+
+    }
+
+    //iidee = iidee.toString();
+    //console.log("updating.." + iidee + " palletDict:");
+    //console.log(this.palletDict);
+    //console.log(this.palletDict.length);
+
+
+    //iidee.printAll();
+
+    /*
+    for (var i = 0; i < this.palletDict.length; i++) {
+        console.log(i + ":s alkio");
+        this.palletDict[i].id;
+    } */
+/*
     if (this.palletDict.indexOf(iidee) == -1) {
         console.log("New PalletID " + iidee + ", pushing it to array")
 
         var print = this.getPalletJSON();
         console.log("Pallet Array: " + print);
-        //console.log("Length of array is : " + this.palletDict.length);
-        //var newName = "Pallet" + this.palletDict.length;
-       // var n = num.toString();
-        //n = new Pallet(1234, 10);
-        //.printAll();
         var portsuffix = this.palletDict.length;
         //console.log(newName);
-        iidee = new Pallet(iidee, portsuffix);
+        iidee = new Pallet(iidee.toString(), portsuffix);
         console.log(iidee);
         this.palletDict.push(iidee);
         iidee.printAll();
     } else {
         //console.log("Same event received multiple times, not pushing to array");
-    }
+    } */
 };
 
 // POST message handling
@@ -77,33 +106,17 @@ app.post('/', function(req, res){
 
     // vastataan antille
     if (req.body.id != "PalletLoaded") {
-
-        pallet = req.body.id;
-
-        //res.write("Hei antti");
-        //res.write( JSON.stringify( WS7.getPalletJSON() ) );
-        //res.write(WS7.getPalletJSON.pallet);
+        //pallet = req.body.id;
+        res.write("Hei antti");
 
         // Pallet loaded event
     } else if (req.body.payload.PalletID) {
-
         var key = req.body.payload.PalletID;
-        //console.log(key);
-        //console.log(req.body.payload.PalletID);
-        // format jason here
-        //var jason = '{"' + key + '" : {"recipe" : [0, 0, 0, 0, 0, 0], "destination" : "0" }} ';
-        //console.log("Text jason: " + jason);
-        //var parsed = JSON.parse(jason);
-        //console.log("Parsed jason: " + parsed);
-
+        console.log("posted" + key);
         WS7.updatePalletJSON(key);
-
-        //console.log("metodilla palautettu: " + WS7.getPalletJSON());
-        //console.log(JSON.stringify( WS7.getPalletJSON() ) ) ;
     } else {
         res.write("oh snap");
     }
-
     res.end('post ok');
 });
 
@@ -141,7 +154,7 @@ function subscribeToEvents() {
 } // end of subscribe
 
 function logJSON() {
-    console.log("DEBUG JSON FUNCTION IOT IOT IOT DASD DASD");
+    console.log("\n DEBUG JSON FUNCTION IOT IOT IOT DASD DASD");
     var palletArray = WS7.getPalletJSON();
 
     for (var i = 0; i < palletArray.length; i++) {
@@ -189,4 +202,4 @@ app.get('/', function(req, res){
 });
 
 subscribeToEvents();
-setInterval(logJSON, 5000);
+//setInterval(logJSON, 5000);
