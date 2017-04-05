@@ -1,15 +1,16 @@
 /**
- * Created by Antti on 4.4.2017.
- */
-var http = require('http');
+* Created by Antti on 4.4.2017.
+*/
+var replaceall = require('replaceall');
+var http = require('http')
 var request = require('request');
 var express = require('express');
 var app = require('express')();
 var bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-var fastIP = 'http://192.168.1.150'
-var myIP = 'http://192.168.1.129' // komentoriville ipconfig
+var fastIP = 'http://localhost'
+var myIP = 'http://localhost' // komentoriville ipconfig
 var serverBasePort = 4000 // Base port plus cellnumber
 
 
@@ -46,6 +47,32 @@ Robotcell.prototype.RunServer = function()
             req.on('data', function(chunk) {
                 body.push(chunk);
                 console.log("Body???: " + body.toString());
+                var data = body.toString()
+                data = replaceall("{", "", data)
+                data = replaceall("}", "", data)
+                data = replaceall('"', "", data)
+                data = replaceall(":", ",", data)
+                data = replaceall("{", "", data)
+                data = replaceall("{", "", data)
+                var datatable = data.split(",")
+                console.log(datatable[0])
+                console.log(datatable[1])
+                console.log(datatable[2])
+                console.log(datatable[3])
+                console.log(datatable[4])
+                console.log(datatable[5])
+                console.log(datatable[6])
+                console.log(datatable[7])
+                console.log(datatable[8])
+                console.log(datatable[9])
+                console.log(datatable[10])
+
+                if(datatable[1] == 'Z1_Changed' && parseInt(datatable[8]) > 0 )
+                {
+                    ref.GetPalletInformation(datatable[8])
+                }
+
+
                 //Handle request.
                 //... ref.makeRequest(...);
                 //Parse the body
@@ -60,8 +87,9 @@ Robotcell.prototype.RunServer = function()
     });
 
     myServer.listen(port, "127.0.0.1", () => {
-        console.log('Agent server ' + ref._name + ' is running at http://127.0.0.1:' + port);
+    console.log('Agent server is running at http://127.0.0.1:' + port);
 });
+
 }
 Robotcell.prototype.SubscribeToCell = function (robcon,funktion)
 {
@@ -88,7 +116,7 @@ Robotcell.prototype.SubscribeToCell = function (robcon,funktion)
 
 }
 
-Robotcell.prototype.GetPalletInformation = function ()
+Robotcell.prototype.GetPalletInformation = function (palletId)
 {
 
 
@@ -96,7 +124,7 @@ Robotcell.prototype.GetPalletInformation = function ()
         uri: fastIP+':4007',
         method: 'POST',
         json: {
-            "id" : "123456"
+            "id" : ""+palletId+""
         }
     };
     request(options, function (error, response, body) {
@@ -135,22 +163,23 @@ Robotcell.prototype.UpdatePalletInformation = function () {
 
 // muuttaa palletin reseptiä ja destinatiota
 
-        var options = {
-            uri: fastIP+':4007',
-            method: 'POST',
-            json: {
-                "order": "[10 , 2, 3, 4, 5, 6]"
-            }
-        };
-        request(options, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                //console.log(body.id) // Print the shortened url.
-            }
-            console.log(response.body);
-            //console.log(error)
+    var options = {
+        uri: fastIP+':4007',
+        method: 'POST',
+        json: {
+            "order": "[10 , 2, 3, 4, 5, 6]"
+        }
+    };
+    request(options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            //console.log(body.id) // Print the shortened url.
+        }
+        console.log(response.body);
 
-        });
-        console.log('perkele')
+        //console.log(error)
+
+    });
+    console.log('perkele')
 
 
 }
