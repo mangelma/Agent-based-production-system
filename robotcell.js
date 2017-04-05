@@ -47,6 +47,32 @@ Robotcell.prototype.RunServer = function()
             req.on('data', function(chunk) {
                 body.push(chunk);
                 console.log("Body???: " + body.toString());
+                var data = body.toString()
+                data = replaceall("{", "", data)
+                data = replaceall("}", "", data)
+                data = replaceall('"', "", data)
+                data = replaceall(":", ",", data)
+                data = replaceall("{", "", data)
+                data = replaceall("{", "", data)
+                var datatable = data.split(",")
+                console.log(datatable[0])
+                console.log(datatable[1])
+                console.log(datatable[2])
+                console.log(datatable[3])
+                console.log(datatable[4])
+                console.log(datatable[5])
+                console.log(datatable[6])
+                console.log(datatable[7])
+                console.log(datatable[8])
+                console.log(datatable[9])
+                console.log(datatable[10])
+
+                if(datatable[1] == 'Z1_Changed' && parseInt(datatable[8]) > 0 )
+                {
+                    ref.GetPalletInformation(datatable[8])
+                }
+
+
                 //Handle request.
                 //... ref.makeRequest(...);
                 //Parse the body
@@ -90,7 +116,7 @@ Robotcell.prototype.SubscribeToCell = function (robcon,funktion)
 
 }
 
-Robotcell.prototype.GetPalletInformation = function ()
+Robotcell.prototype.GetPalletInformation = function (palletId)
 {
 
 
@@ -98,7 +124,7 @@ Robotcell.prototype.GetPalletInformation = function ()
         uri: fastIP+':4007',
         method: 'POST',
         json: {
-            "id" : "123456"
+            "id" : ""+palletId+""
         }
     };
     request(options, function (error, response, body) {
