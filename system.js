@@ -60,7 +60,7 @@ LoadingCell.prototype.updatePalletJSON = function (iidee) {
         //n = new Pallet(1234, 10);
         //.printAll();
         var portsuffix = this.palletDict.length;
-        //console.log(newName);
+        //console.log(newName);§
         iidee = new Pallet(iidee, portsuffix);
         console.log(iidee);
         this.palletDict.push(iidee);
