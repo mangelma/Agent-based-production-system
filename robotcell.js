@@ -1,15 +1,16 @@
 /**
- * Created by Antti on 4.4.2017.
- */
-var http = require('http');
+* Created by Antti on 4.4.2017.
+*/
+var replaceall = require('replaceall');
+var http = require('http')
 var request = require('request');
 var express = require('express');
 var app = require('express')();
 var bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-var fastIP = 'http://192.168.1.150'
-var myIP = 'http://192.168.1.129' // komentoriville ipconfig
+var fastIP = 'http://localhost'
+var myIP = 'http://localhost' // komentoriville ipconfig
 var serverBasePort = 4000 // Base port plus cellnumber
 
 
@@ -60,8 +61,9 @@ Robotcell.prototype.RunServer = function()
     });
 
     myServer.listen(port, "127.0.0.1", () => {
-        console.log('Agent server ' + ref._name + ' is running at http://127.0.0.1:' + port);
+    console.log('Agent server is running at http://127.0.0.1:' + port);
 });
+
 }
 Robotcell.prototype.SubscribeToCell = function (robcon,funktion)
 {
@@ -135,22 +137,23 @@ Robotcell.prototype.UpdatePalletInformation = function () {
 
 // muuttaa palletin reseptiä ja destinatiota
 
-        var options = {
-            uri: fastIP+':4007',
-            method: 'POST',
-            json: {
-                "order": "[10 , 2, 3, 4, 5, 6]"
-            }
-        };
-        request(options, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                //console.log(body.id) // Print the shortened url.
-            }
-            console.log(response.body);
-            //console.log(error)
+    var options = {
+        uri: fastIP+':4007',
+        method: 'POST',
+        json: {
+            "order": "[10 , 2, 3, 4, 5, 6]"
+        }
+    };
+    request(options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            //console.log(body.id) // Print the shortened url.
+        }
+        console.log(response.body);
 
-        });
-        console.log('perkele')
+        //console.log(error)
+
+    });
+    console.log('perkele')
 
 
 }
