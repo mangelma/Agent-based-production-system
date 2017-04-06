@@ -42,12 +42,17 @@ Robotcell.prototype.RunServer = function()
             res.setHeader('Content-Type', 'text/plain');
             res.end('Agent ' + ref._name + ' is running.');
         } else if(method == 'POST'){
+
+            console.log(frame = req.body.split("=")[4].split["&"][0]);
+
             //Handle POST method.
             var body = []; //Getting data: https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
             req.on('data', function(chunk) {
+                console.log(chunk);
                 body.push(chunk);
                 console.log("Body???: " + body.toString());
                 var data = body.toString()
+                //console.log(data);
                 data = replaceall("{", "", data)
                 data = replaceall("}", "", data)
                 data = replaceall('"', "", data)
@@ -56,7 +61,7 @@ Robotcell.prototype.RunServer = function()
                 data = replaceall("=", ",", data)
                 data = replaceall("&", ",", data)
                 var datatable = data.split(",")
-                console.log(datatable[0])
+               /* console.log(datatable[0])
                 console.log(datatable[1])
                 console.log(datatable[2])
                 console.log(datatable[3])
@@ -66,6 +71,7 @@ Robotcell.prototype.RunServer = function()
                 console.log(datatable[7])
                 console.log(datatable[8])
                 console.log(datatable[9])
+<<<<<<< HEAD
                 console.log(datatable[10])
                 console.log(datatable[11])
                 console.log(datatable[12])
@@ -76,6 +82,9 @@ Robotcell.prototype.RunServer = function()
                 console.log(datatable[17])
                 console.log(datatable[18])
                 console.log(datatable[19])
+=======
+                console.log(datatable[10]) */
+>>>>>>> origin/master
 
                 if(datatable[1] == 'Z1_Changed' && parseInt(datatable[8]) > 0 )
                 {
