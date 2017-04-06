@@ -42,11 +42,11 @@ LoadingCell.prototype.checkJSON = function (iidee) {
 }
 
 function updatePalletArray(iidee) {
-    console.log("Updating: " + iidee);
+    //console.log("Updating: " + iidee);
     //console.log("exist " + iidee in palletArray);
     // if we dont yet have this id in our array
     if (!(iidee in palletArray)) {
-        console.log("New pallet, adding it to array");
+        console.log("New pallet, adding it to array " + iidee);
         var initPallet = {
             rfid: iidee,
             port: 4100 + Object.keys(palletArray).length,
@@ -62,9 +62,13 @@ function updatePalletArray(iidee) {
         palletArray[iidee] = initPallet;
         //console.log("updated " + JSON.stringify(palletArray));
     } else {
-        console.log("Of fuck, multiple events");
+        console.log("Multiple events, ignoring " + iidee);
     }
 };
+
+function updatePalletInformation(iidee, updatedInfo) {
+    palletArray[iidee] = updatedInfo;
+}
 
 function checkJSON(palletId) {
 
@@ -117,12 +121,20 @@ app.post('/', function(req, res){
 
         // Pallet loaded event
     } else if (req.body.id == 'PalletLoaded') {
-        console.log("Palletloaded received");
-        console.log(req.body);
+        //console.log("Palletloaded received");
+        //console.log(req.body);
         var key = req.body.payload.PalletID;
         //console.log("posted " + key);
         updatePalletArray(key);
-        updatePalletInformation()
+        //updatePalletInformation()
+
+    } else if (req.body.id == 'UpdatePalletInformation') {
+        var key = req.body.PalletID;
+        var information = req.body.Information;
+        console.log("updating " + key + " with information " + JSON.stringify(information));
+        updatePalletInformation(key, information);
+
+        // unidentified posts
     } else {
         console.log("Unidentifiend post message with body: ");
         console.log(req.body);
