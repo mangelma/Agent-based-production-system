@@ -53,7 +53,8 @@ Robotcell.prototype.RunServer = function()
                 data = replaceall('"', "", data)
                 data = replaceall(":", ",", data)
                 data = replaceall("{", "", data)
-                data = replaceall("{", "", data)
+                data = replaceall("=", ",", data)
+                data = replaceall("&", ",", data)
                 var datatable = data.split(",")
                 console.log(datatable[0])
                 console.log(datatable[1])
@@ -66,6 +67,15 @@ Robotcell.prototype.RunServer = function()
                 console.log(datatable[8])
                 console.log(datatable[9])
                 console.log(datatable[10])
+                console.log(datatable[11])
+                console.log(datatable[12])
+                console.log(datatable[13])
+                console.log(datatable[14])
+                console.log(datatable[15])
+                console.log(datatable[16])
+                console.log(datatable[17])
+                console.log(datatable[18])
+                console.log(datatable[19])
 
                 if(datatable[1] == 'Z1_Changed' && parseInt(datatable[8]) > 0 )
                 {
@@ -76,6 +86,27 @@ Robotcell.prototype.RunServer = function()
                 else if(datatable[1] == 'Z4_Changed')
                 {
                     ref.MovePallet('TransZone45')
+                }
+
+                else if(datatable[4] == 'frame')
+                {
+                    console.log('meitte tuli tietoa palletista')
+                    var resepti = datatable[5]+","+datatable[7]+","+datatable[9]+","+datatable[11]+","+datatable[13]
+                        +","+datatable[15]
+                    if(datatable[17] == 0)
+                    {
+                        ref.DecideNextPalletDestinaton(resepti)
+                    }
+                    else if(parseInt(datatable[17]) == this.place)
+                    {
+                        ref.MakeJob(resepti)
+                    }
+                    else
+                    {
+                        ref.MovePallet('TransZone14')
+                    }
+                    console.log(resepti)
+
                 }
 
 
@@ -131,26 +162,28 @@ Robotcell.prototype.GetPalletInformation = function (palletId)
         uri: fastIP+':4107',
         method: 'POST',
         json: {
-            "palletInfo" : ""+palletId+""
+            "id" : "GetPalletInfo","palletInfo": ""+palletId+""
         }
     };
 
-
-var resbody = request(options, function (error, response, body){
-        console.log('ny pyydetään tietoja palletista')
+    var destination= 0;
+    request(options, function (error, response, body){
+        console.log('ny pyydetään tietoja palletista');
         if (!error && response.statusCode == 200) {
-            console.log("palletin body =" + body) // Print the shortened url.
+            console.log("palletin body =" + body); // Print the shortened url.
             //todo body parsetaan ja sieltä saadaan seuraavat tiedot
-            var resepti = [1, 1, 1, 1, 1, 1]
-             var destination = 9
-            console.log('destination =' + destination)
+            var resepti = [1, 1, 1, 1, 1, 1];
+             destination = 9;
+            console.log('destination =' + destination);
+           // ref.MovePallet('TransZone14')
         }
         else
         {
-            console.log(error)
+            console.log(error);
         }
 
     })
+    console.log(destination);
 }
 
 
@@ -164,7 +197,17 @@ Robotcell.prototype.CheckOwnState = function ()
 {
 
 }
-Robotcell.prototype.MakeJob = function () {
+Robotcell.prototype.MakeJob = function (recept)
+{
+
+    var reseptTable = recept.split(",")
+    console.log(reseptTable[0])
+    console.log(reseptTable[1])
+    console.log(reseptTable[2])
+    console.log(reseptTable[3])
+    console.log(reseptTable[4])
+    console.log(reseptTable[5])
+
 
 }
 //tekee reseptin mukaisen työn, jos vaan soluun mahtuu pallet.
@@ -195,12 +238,42 @@ Robotcell.prototype.UpdatePalletInformation = function () {
 
 
 }
-Robotcell.prototype.GetCellStates = function () {
+Robotcell.prototype.GetCellStates = function (cellPlace, recept)
+{
+    var ref = this
+
+
+    var options = {
+        uri: fastIP+':4107',
+        method: 'POST',
+        json: {
+            "id" : "GetPalletInfo","palletInfo": ""+palletId+""
+        }
+    };
+
+    var destination= 0;
+    request(options, function (error, response, body){
+        console.log('ny pyydetään tietoja palletista');
+        if (!error && response.statusCode == 200) {
+            console.log("palletin body =" + body); // Print the shortened url.
+            //todo body parsetaan ja sieltä saadaan seuraavat tiedot
+            var resepti = [1, 1, 1, 1, 1, 1];
+            destination = 9;
+            console.log('destination =' + destination);
+            // ref.MovePallet('TransZone14')
+        }
+        else
+        {
+            console.log(error);
+        }
+
+    })
 
 }
 // kysyy kaikilta soluita (state, stack, pencolor, job
 
 Robotcell.prototype.DecideNextPalletDestinaton = function () {
+    console.log('ny päätetään seuraapa pallet destination')
 
 }
 //päätä getcellstate tietojen pohjalta mihin pallet menee seuraavaksi
@@ -260,7 +333,8 @@ var john = new Robotcell(8,'1');
 john.RunServer();
 john.SubscribeToCell('CNV','Z1_Changed')
 john.SubscribeToCell('CNV','Z4_Changed')
-john.MovePallet('TransZone14')
+//john.MovePallet('TransZone14')
+//john.MakeJob('0,0,0,0,0,0')
 
 // Stating computations
 //var theResult = g.find("green", []);
