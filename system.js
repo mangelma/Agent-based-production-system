@@ -155,7 +155,7 @@ function sendInfo(message) {
     console.log("Sending information " + message);
     request.post({
         headers: {'content-type' : 'application/json'},
-        url: 'http://localhost:4800',
+        url: 'http://localhost:4008',
         form: message
             }, function(error, response, body){
             console.log(body);
