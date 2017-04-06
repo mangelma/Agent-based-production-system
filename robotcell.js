@@ -121,17 +121,36 @@ Robotcell.prototype.GetPalletInformation = function (palletId)
 
 
     var options = {
-        uri: fastIP+':4007',
+        uri: fastIP+':4107',
         method: 'POST',
         json: {
-            "id" : ""+palletId+""
+            "palletInfo" : ""+palletId+""
         }
     };
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            //console.log(body.id) // Print the shortened url.
+            console.log("palletin body =" +body) // Print the shortened url.
+            //todo body parsetaan ja sieltä saadaan seuraavat tiedot
+            var resepti= [1,1,1,1,1,1]
+            var destination = 0
+            if(destination == 0)
+            {
+                //mene DecideNextPalletDestinaton
+            }
+            else if(destination == this.place)
+            {
+                // mene makejob
+            }
+            else
+            {
+                //mene skippallet
+            }
+
         }
-        console.log(error)
+        else
+        {
+            console.log(error)
+        }
 
     });
     console.log('perkele')
@@ -164,7 +183,7 @@ Robotcell.prototype.UpdatePalletInformation = function () {
 // muuttaa palletin reseptiä ja destinatiota
 
     var options = {
-        uri: fastIP+':4007',
+        uri: fastIP+':4107',
         method: 'POST',
         json: {
             "order": "[10 , 2, 3, 4, 5, 6]"
@@ -198,7 +217,34 @@ Robotcell.prototype.SimulatePalletArrivesToCON1 = function () {
 }
 
 
-Robotcell.prototype.SkipPallet = function () {
+Robotcell.prototype.SkipPallet = function ()
+{
+
+    port = this.place+serverBasePort
+
+    var options = {
+        uri: fastIP + ':3000/RTU/CNV'+ this.place + '/services/TransZone14',
+        method: 'POST',
+        json: {"destUrl": myIP+':'+port}
+    };
+    //http://localhost:3000/RTU/CNV*/services/TransZone14
+    console.log(fastIP + ':3000/RTU/CNV'+ this.place + '/services/TransZone14')
+    console.log("destUrl :"+ myIP+':'+port)
+    request(options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            //console.log(body.id) // Print the shortened url.
+            console.log(body)
+        }
+        else{
+            console.log('error ='+error)
+            console.log('statuscode ='+response.statusCode)
+        }
+
+
+        console.log('pallet Skipped')
+    });
+
+
 
 }
 // lähettää palletin 1to4 ja 4 to 5
@@ -217,9 +263,9 @@ var john = new Robotcell(8,'1');
 
 //john.UpdatePalletInformation();
 //john.GetPalletInformation();
-john.RunServer();
-john.SubscribeToCell('CNV','Z1_Changed')
-
+//john.RunServer();
+//john.SubscribeToCell('CNV','Z1_Changed')
+john.SkipPallet()
 
 // Stating computations
 //var theResult = g.find("green", []);
