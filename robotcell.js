@@ -86,6 +86,7 @@ Robotcell.prototype.RunServer = function()
                 }
                 else if(datatable[1] == 'Z2_Changed')
                 {
+                    console.log('pallet tuli zone2 cell '+this.place)
                     ref.MovePallet('TransZone23')
                 }
                 else if(datatable[1] == 'Z3_Changed')
@@ -94,6 +95,7 @@ Robotcell.prototype.RunServer = function()
                 }
                 else if(datatable[1] == 'Z4_Changed')
                 {
+                    console.log('pallet tuli zone4 cell '+this.place)
                     ref.MovePallet('TransZone45')
                 }
                 else if(datatable[0] == 'getCellinfo')
@@ -110,14 +112,17 @@ Robotcell.prototype.RunServer = function()
                         +","+datatable[15]
                     if(datatable[17] == 0)
                     {
+                        console.log('pallet on cell '+this.place+'desideNExtDestination')
                         ref.DecideNextPalletDestinaton(resepti, datatable[8])
                     }
                     else if(parseInt(datatable[17]) == this.place)
                     {
+                        console.log('pallet on cell '+this.place+'makeJOb')
                         ref.MakeJob(resepti)
                     }
                     else
                     {
+                        console.log('pallet on cell '+this.place+'ei kuulu meille skipataan')
                         ref.MovePallet('TransZone14')
                     }
                     console.log(resepti)
@@ -470,11 +475,11 @@ var joonas = new Robotcell(10,'3')
 
 //john.UpdatePalletInformation();
 //john.GetPalletInformation();
-john.RunServer();
-john.SubscribeToCell('CNV','Z1_Changed')
-john.SubscribeToCell('CNV','Z2_Changed')
-john.SubscribeToCell('CNV','Z3_Changed')
-john.SubscribeToCell('CNV','Z4_Changed')
+//john.RunServer();
+//john.SubscribeToCell('CNV','Z1_Changed')
+//john.SubscribeToCell('CNV','Z2_Changed')
+//john.SubscribeToCell('CNV','Z3_Changed')
+//john.SubscribeToCell('CNV','Z4_Changed')
 
 
 //john.MovePallet('TransZone12')
@@ -485,12 +490,12 @@ john.SubscribeToCell('CNV','Z4_Changed')
 //john.UpdatePalletInformation()
 
 
-joonas.RunServer();
+//joonas.RunServer();
 max.RunServer();
-//max.SubscribeToCell('CNV','Z1_Changed')
-//max.SubscribeToCell('CNV','Z2_Changed')
-//max.SubscribeToCell('CNV','Z3_Changed')
-//max.SubscribeToCell('CNV','Z4_Changed')
+max.SubscribeToCell('CNV','Z1_Changed')
+max.SubscribeToCell('CNV','Z2_Changed')
+max.SubscribeToCell('CNV','Z3_Changed')
+max.SubscribeToCell('CNV','Z4_Changed')
 // Stating computations
 //var theResult = g.find("green", []);
 //console.log("Result: ", theResult);

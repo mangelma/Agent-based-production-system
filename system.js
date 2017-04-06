@@ -62,7 +62,7 @@ function updatePalletArray(iidee, initPallet) {
         palletArray[iidee] = initPallet;
         //console.log("updated " + JSON.stringify(palletArray));
     } else {
-        console.log("Multiple events, ignoring " + iidee);
+        //console.log("Multiple events, ignoring " + iidee);
     }
 };
 
@@ -92,7 +92,7 @@ function checkJSON(palletId) {
 
 // POST message handling
 app.post('/', function(req, res){
-    console.log(req.body.id + " received!");
+    //console.log(req.body.id + " received!");
 
     // vastataan antille
     if (req.body.id == 'GetPalletInfo') {
@@ -114,8 +114,8 @@ app.post('/', function(req, res){
         var initPallet = {
             rfid: key,
             port: 4100 + Object.keys(palletArray).length,
-            frame : 1, screen : 2, keyboard : 0,
-            fcolor : 1, scolor : 2, kcolor : 0,
+            frame : 0, screen : 0, keyboard : 0,
+            fcolor : 0, scolor : 0, kcolor : 0,
             destination: 1, hasPaper : 0
         };
 
@@ -142,14 +142,11 @@ app.post('/', function(req, res){
 app.post('/order', function(req, res){
     console.log(req.body.id + " received!");
 
-    // vastataan antille
     if (req.body.id == 'PlaceOrder') {
         var information = req.body.Information;
         console.log("Making order with information " + JSON.stringify(information));
         //updatePalletInformation(key, information);
-
-        //invokePalletLoading(information);
-
+        invokePalletLoading(information);
         res.write("Thank you for placing order");
 
     } else {
@@ -159,27 +156,6 @@ app.post('/order', function(req, res){
     }
     res.end('\n Order Received');
 });
-
-
-function changeRecipe() {
-    first++;
-    var options = {
-        uri: 'http://127.0.0.1:4001/',
-        method: 'POST',
-        json: {
-            "order" : "[" + first + ", 2, 3, 4, 5, 6]"
-        }
-    };
-    request(options, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            //console.log(body.id) // Print the shortened url.
-        }
-    });
-}
-
-// HUOM
-// urlit muotoa http://localhost:3000/RTU/SimROB7/events/PalletLoaded/notifs
-// HUOM
 
 function sendInfo(message) {
     //message = JSON.stringify(message);
@@ -193,10 +169,9 @@ function sendInfo(message) {
             if (error) { console.log(error); };
         });
 } // end of subscribe
-
 function subscribeToEvents() {
     // initialize also the WS7 here
-    WS7.init();
+    //WS7.init();
     console.log("Subscribed to PalletLoaded!");
     request.post('http://localhost:3000/RTU/SimROB7/events/PalletLoaded/notifs',
         {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
@@ -205,6 +180,33 @@ function subscribeToEvents() {
         //console.log(httpResponse);
         });
 } // end of subscribe
+function invokePalletLoading(information) {
+
+    //console.log("Invoking pallet loading...");
+    request.post('http://localhost:3000/RTU/SimROB7/services/LoadPallet',
+        {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
+            if(err) {
+                console.log(err);
+            } else {
+                //console.log(body);
+
+                setTimeout(function() {
+                    console.log("Invoked palletarray:");
+                    console.log(palletArray);
+                    var length = Object.keys(palletArray).length;
+                    console.log("lenght: " + length);
+                    iidee = palletArray[Object.keys(palletArray)[length-1]];
+                    console.log(Object.keys(palletArray)[length-1]);
+                    console.log("iidee: " + iidee);
+                    console.log(JSON.stringify(iidee));
+                    console.log("iidee.rfid: " + iidee.rfid);
+                    updatePalletInformation(iidee.rfid, information);
+                }, 5000);
+
+                //updatePalletInformation(iidee, information);
+            }
+        });
+}
 
 function logJSON() {
     console.log("\n " + Object.keys(palletArray).length + " Pallets in Array");
