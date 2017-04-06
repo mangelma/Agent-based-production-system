@@ -377,15 +377,15 @@ var john = new Robotcell(8,'1');
 
 //john.UpdatePalletInformation();
 //john.GetPalletInformation();
-//john.RunServer();
-//john.SubscribeToCell('CNV','Z1_Changed')
-//john.SubscribeToCell('CNV','Z2_Changed')
-//john.SubscribeToCell('CNV','Z3_Changed')
-//john.SubscribeToCell('CNV','Z4_Changed')
+john.RunServer();
+john.SubscribeToCell('CNV','Z1_Changed')
+john.SubscribeToCell('CNV','Z2_Changed')
+john.SubscribeToCell('CNV','Z3_Changed')
+john.SubscribeToCell('CNV','Z4_Changed')
 //john.MovePallet('TransZone12')
 //john.MakeJob('0,0,0,0,0,0')
 //john.GetCellStates(8,'0,0,0,0,0,0')
-john.UpdatePalletInformation()
+//john.UpdatePalletInformation()
 
 // Stating computations
 //var theResult = g.find("green", []);
