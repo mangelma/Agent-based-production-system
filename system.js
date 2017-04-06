@@ -96,6 +96,7 @@ app.post('/', function(req, res){
 
         // Pallet loaded event
     } else if (req.body.payload.PalletID) {
+        console.log(req.body);
         var key = req.body.payload.PalletID;
         //console.log("posted " + key);
         updatePalletJSON(key);
@@ -140,34 +141,37 @@ function subscribeToEvents() {
 
 function logJSON() {
     console.log("\n DEBUG JSON FUNCTION IOT IOT IOT DASD DASD");
-    //console.log("PalletDict: " + palletDict);
-    console.log("With lenght: " + palletDict.length);
+    console.log("PalletDict: " + JSON.stringify(palletDict));
+    console.log("Array lenght: " + palletDict.length);
 
     for (var i = 0; i < palletDict.length; i++) {
 
-        //console.log("looping throught the dict");
+        var thisId = palletDict[i];
 
+        //console.log("looping throught the dict");
         //console.log(palletArray[i].toString());
         //var thisId = palletArray[i].toString();
-        var thisId = palletDict[i];
         //console.log(thisId);
-
         //console.log("Type of thisid " + typeof thisId);
         //console.log("Type of palletarray[i] " + typeof palletArray[i]);
-
         //console.log("Index of " + thisId + " in palletarray: " + palletArray.indexOf(thisId));
-        //console.log(WS7.getPalletJSON());
-        //console.log("Testipalikka: " + palikka);
-        //console.log("Palikka.printAll: ");
-        //palikka.printAll();
+
         console.log("Information about: " + thisId.id + " port " + thisId.port);
+
+        console.log(palletDict[i]);
+        console.log(palletDict[i+1]);
+
+        if (i >= 1 && palletDict[i].id == palletDict[i-1].id) {
+            console.log("Oh fuck, duplicate ids");
+        } else {
+            console.log("no multiple ids, good!");
+        }
         //console.log("Index in palletarray: " + palletArray.indexOf(thisId));
         //thisId.printAll();
         //console.log(Pallet.keys(thisId));
     }
 
     //console.log(['123456'].printAll());
-
    // console.log("Stringified: " + JSON.stringify(print));
     //console.log("Whole JSON " + print);
     // "1491319248646"
