@@ -69,7 +69,13 @@ Robotcell.prototype.RunServer = function()
 
                 if(datatable[1] == 'Z1_Changed' && parseInt(datatable[8]) > 0 )
                 {
+                    console.log('ennen getpalletinformation')
                     ref.GetPalletInformation(datatable[8])
+                    console.log('jälkeen getpalletinformation')
+                }
+                else if(datatable[1] == 'Z4_Changed')
+                {
+                    ref.MovePallet('TransZone45')
                 }
 
 
@@ -97,11 +103,11 @@ Robotcell.prototype.SubscribeToCell = function (robcon,funktion)
     port = this.place+serverBasePort
 
     var options = {
-        uri: fastIP + ':3000/RTU/Sim'+robcon+ this.place + '/events/Z1_Changed/notifs',
+        uri: fastIP + ':3000/RTU/Sim'+robcon+ this.place + '/events/'+funktion+'/notifs',
         method: 'POST',
         json: {"destUrl": myIP+':'+port}
     };
-    console.log(fastIP + ':3000/RTU/'+robcon+ this.place + '/events/Z1_Changed/notifs')
+    console.log(fastIP + ':3000/RTU/'+robcon+ this.place + '/events/'+funktion+'/notifs')
     console.log("destUrl :"+ myIP+':'+port)
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -118,6 +124,7 @@ Robotcell.prototype.SubscribeToCell = function (robcon,funktion)
 
 Robotcell.prototype.GetPalletInformation = function (palletId)
 {
+    var ref = this
 
 
     var options = {
@@ -127,46 +134,33 @@ Robotcell.prototype.GetPalletInformation = function (palletId)
             "palletInfo" : ""+palletId+""
         }
     };
-    request(options, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            console.log("palletin body =" +body) // Print the shortened url.
-            //todo body parsetaan ja sieltä saadaan seuraavat tiedot
-            var resepti= [1,1,1,1,1,1]
-            var destination = 0
-            if(destination == 0)
-            {
-                //mene DecideNextPalletDestinaton
-            }
-            else if(destination == this.place)
-            {
-                // mene makejob
-            }
-            else
-            {
-                //mene skippallet
-            }
 
+
+    request(options, function (error, response, body){
+        console.log('ny pyydetään tietoja palletista')
+        if (!error && response.statusCode == 200) {
+            console.log("palletin body =" + body) // Print the shortened url.
+            //todo body parsetaan ja sieltä saadaan seuraavat tiedot
+            var resepti = [1, 1, 1, 1, 1, 1]
+             var destination = 9
+            console.log('destination =' + destination)
         }
         else
         {
             console.log(error)
         }
 
-    });
-    console.log('perkele')
-}
-//takaisin resepti ja destination
-
-Robotcell.prototype.CheckDestination = function () {
+    })
 
 }
+
+
+Robotcell.prototype.CheckDestination = function ()
 //vertaa palletdestionation ja cell plasea.
 {
 
 }
-Robotcell.prototype.CheckOwnState = function () {
-
-}
+Robotcell.prototype.CheckOwnState = function ()
 //Tarkistaa oman jonon ja staten
 {
 
@@ -217,18 +211,18 @@ Robotcell.prototype.SimulatePalletArrivesToCON1 = function () {
 }
 
 
-Robotcell.prototype.SkipPallet = function ()
+Robotcell.prototype.MovePallet = function (zone)
 {
 
     port = this.place+serverBasePort
 
     var options = {
-        uri: fastIP + ':3000/RTU/CNV'+ this.place + '/services/TransZone14',
+        uri: fastIP + ':3000/RTU/SimCNV'+ this.place + '/services/'+zone,
         method: 'POST',
         json: {"destUrl": myIP+':'+port}
     };
     //http://localhost:3000/RTU/CNV*/services/TransZone14
-    console.log(fastIP + ':3000/RTU/CNV'+ this.place + '/services/TransZone14')
+    console.log(fastIP + ':3000/RTU/SimCNV'+ this.place + '/services/TransZone14')
     console.log("destUrl :"+ myIP+':'+port)
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -247,7 +241,8 @@ Robotcell.prototype.SkipPallet = function ()
 
 
 }
-// lähettää palletin 1to4 ja 4 to 5
+
+// lähettää palletin haluamallasi tavalla
 
 Robotcell.prototype.SendCellInfomation = function () {
 
@@ -263,9 +258,10 @@ var john = new Robotcell(8,'1');
 
 //john.UpdatePalletInformation();
 //john.GetPalletInformation();
-//john.RunServer();
-//john.SubscribeToCell('CNV','Z1_Changed')
-john.SkipPallet()
+john.RunServer();
+john.SubscribeToCell('CNV','Z1_Changed')
+john.SubscribeToCell('CNV','Z4_Changed')
+john.MovePallet('TransZone14')
 
 // Stating computations
 //var theResult = g.find("green", []);
