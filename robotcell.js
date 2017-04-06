@@ -136,7 +136,7 @@ Robotcell.prototype.GetPalletInformation = function (palletId)
     };
 
 
-    request(options, function (error, response, body){
+var resbody = request(options, function (error, response, body){
         console.log('ny pyydetään tietoja palletista')
         if (!error && response.statusCode == 200) {
             console.log("palletin body =" + body) // Print the shortened url.
@@ -151,7 +151,6 @@ Robotcell.prototype.GetPalletInformation = function (palletId)
         }
 
     })
-
 }
 
 
