@@ -43,29 +43,27 @@ LoadingCell.prototype.checkJSON = function (iidee) {
 
 function updatePalletArray(iidee) {
     console.log("Updating: " + iidee);
-    console.log("exist " + iidee in palletArray);
-
+    //console.log("exist " + iidee in palletArray);
     // if we dont yet have this id in our array
     if (!(iidee in palletArray)) {
-
+        console.log("New pallet, adding it to array");
         var initPallet = {
             rfid: iidee,
-            port: 4100 + palletArray.length,
-            recipe: [0,0,0,0,0,0],
-            destination: 0
+            port: 4100 + Object.keys(palletArray).length,
+            frame : 0,
+            screen : 0,
+            keyboard : 0,
+            fcolor : 0,
+            scolor : 0,
+            kcolor : 0,
+            destination: 0,
+            hasPaper : 0
         };
-
         palletArray[iidee] = initPallet;
-
-        console.log("updated " + JSON.stringify(palletArray));
-
-
-
+        //console.log("updated " + JSON.stringify(palletArray));
     } else {
         console.log("Of fuck, multiple events");
     }
-
-
 };
 
 function checkJSON(palletId) {
@@ -105,21 +103,27 @@ app.post('/', function(req, res){
     //console.log(req.body);
 
     // vastataan antille
-    if (req.body.id != "PalletLoaded") {
+    if (req.body.id == 'GetPalletInfo') {
+        console.log("GetPalletInfo received, with body of ");
         console.log(req.body);
-        console.log(req.body.palletInfo);
+        console.log("Asked palletID " + req.body.palletInfo);
         //var askedPalletId = req.body.palletInfo;
         //console.log(askedPalletId);
         res.write("Hei ANTTI, ID jolta kysyit: ");
-        res.write(req.body.palletInfo);
+        res.write(JSON.stringify(req.body.palletInfo));
+        //console.log("Etsitty pallet: " + palletArray[req.body.palletInfo])
+
+        sendInfo(palletArray[req.body.palletInfo]);
 
         // Pallet loaded event
-    } else if (req.body.payload.PalletID) {
-        //console.log(req.body);
+    } else if (req.body.id == 'PalletLoaded') {
+        console.log("Palletloaded received");
         var key = req.body.payload.PalletID;
         //console.log("posted " + key);
         updatePalletArray(key);
     } else {
+        console.log("Unidentifiend post message with body: ");
+        console.log(req.body);
         res.write("oh snap");
     }
     res.end('\n Information Exhange Sequence End');
@@ -146,6 +150,19 @@ function changeRecipe() {
 // urlit muotoa http://localhost:3000/RTU/SimROB7/events/PalletLoaded/notifs
 // HUOM
 
+function sendInfo(message) {
+    //message = JSON.stringify(message);
+    console.log("Sending information " + message);
+    request.post({
+        headers: {'content-type' : 'application/json'},
+        url: 'http://localhost:4800',
+        form: message
+            }, function(error, response, body){
+            console.log(body);
+            if (error) { console.log(error); };
+        });
+} // end of subscribe
+
 function subscribeToEvents() {
     // initialize also the WS7 here
     WS7.init();
@@ -162,12 +179,11 @@ function logJSON() {
     console.log("\n DEBUG JSON FUNCTION IOT IOT IOT DASD DASD");
     //console.log("PalletArray: " + JSON.stringify(palletArray));
     console.log(palletArray);
+    console.log("Lenght: " + Object.keys(palletArray).length);
     //console.log("Array lenght: " + palletArray.length);
 
-    for (var i = 0; i < palletArray.length; i++) {
-
-        var thisId = palletArray[i];
-
+   // for (var i = 0; i < palletArray.length; i++) {
+     //   var thisId = palletArray[i];
         //console.log("looping throught the Array");
         //console.log(palletArray[i].toString());
         //var thisId = palletArray[i].toString();
@@ -177,19 +193,17 @@ function logJSON() {
         //console.log("Index of " + thisId + " in palletarray: " + palletArray.indexOf(thisId));
 
         //console.log("Information about: " + thisId.id + " port " + thisId.port);
-
         //console.log(palletArray[i]);
         //console.log(palletArray[i+1]);
-
-        if (i >= 1 && palletArray[i].id == palletArray[i-1].id) {
+      //  if (i >= 1 && palletArray[i].id == palletArray[i-1].id) {
             //console.log("Oh fuck, duplicate ids");
-        } else {
+       // } else {
             //console.log("no multiple ids, good!");
-        }
+        //}
         //console.log("Index in palletarray: " + palletArray.indexOf(thisId));
         //thisId.printAll();
         //console.log(Pallet.keys(thisId));
-    }
+   // }
 
     //console.log(['123456'].printAll());
    // console.log("Stringified: " + JSON.stringify(print));
