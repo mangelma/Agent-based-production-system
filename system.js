@@ -7,13 +7,13 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var port = 4107;
-var palletDict = [];
+var palletArray = {};
 
 // Agentti WS7
 var LoadingCell = function LoadingCell() {
     this.place = 7;
     this.job = 4; // 1 screen, 2 keyboard, 3 frame, 4 load/unload, 5 paper in/out
-    //this.palletDict = [];
+    //this.palletArray = [];
 };
 var Pallet = function Pallet(id, port) {
     this.id = id;
@@ -28,12 +28,12 @@ Pallet.prototype.printAll = function () {
 var WS7 = new LoadingCell();
 LoadingCell.prototype.getPalletJSON = function () {
     //console.log("printing json from agent json");
-    //console.log(this.palletDict);
-    //return this.palletDict;
+    //console.log(this.palletArray);
+    //return this.palletArray;
 };
 LoadingCell.prototype.init = function() {
     //console.log("WS7 initialized with 123456 as first id in array");
-    //this.palletDict[0] = 123456;
+    //this.palletArray[0] = 123456;
 };
 LoadingCell.prototype.checkJSON = function (iidee) {
     //console.log("Checking uniquity");
@@ -41,42 +41,61 @@ LoadingCell.prototype.checkJSON = function (iidee) {
     //return palletArray.id === 'iidee';
 }
 
-function updatePalletJSON(iidee) {
-    console.log(iidee);
-    //var palletArray = WS7.getPalletJSON();
-    //console.log(palletArray);
-    var arrayLength = palletDict.length;
+function updatePalletArray(iidee) {
+    console.log("Updating: " + iidee);
+    console.log("exist " + iidee in palletArray);
 
-    if (arrayLength == 0) {
-        console.log("ensimmäinen alkio pushataan aina " + iidee);
-        var portsuffix = arrayLength;
-        iidee = new Pallet(iidee.toString(), portsuffix);
-        palletDict.push(iidee)
+    // if we dont yet have this id in our array
+    if (!(iidee in palletArray)) {
+
+        var initPallet = {
+            rfid: iidee,
+            port: 4100 + palletArray.length,
+            recipe: [0,0,0,0,0,0],
+            destination: 0
+        };
+
+        palletArray[iidee] = initPallet;
+
+        console.log("updated " + JSON.stringify(palletArray));
+
+
+
     } else {
-        console.log("checking...");
-        console.log(checkJSON(iidee));
-
-        if (!checkJSON(iidee)) {
-            console.log("New palletid, pushing " + iidee);
-            var portsuffix = arrayLength;
-            iidee = new Pallet(iidee.toString(), portsuffix);
-            palletDict.push(iidee);
-        }
-
+        console.log("Of fuck, multiple events");
     }
 
-console.log("\n");
+
 };
 
 function checkJSON(palletId) {
+
+    console.log("Checking uniqueness of: " + palletId);
+
+    for (var i = 0; i < palletArray.length; i++) {
+
+        //var thisId = palletArray[i];
+        //console.log("Information about: " + thisId.id + " port " + thisId.port);
+        //console.log("Comparing: " + palletArray[i].id + " and " + palletArray[i-1].id);
+
+        if ( i >= 1 && palletArray[i].id == palletArray[i-1].id ) {
+            console.log("Comparing: " + palletArray[i].id + " and " + palletArray[i-1].id);
+            console.log("CHECK: Oh fuck, duplicate ids");
+            return false;
+        } else {
+            console.log("CHECK: no multiple ids, good!");
+            return true;
+        }
+
+    /*
     var hasTag = function(palletId) {
         var i = null;
-        for (i = 0; palletDict.length > i; i += 1) {
-            if (palletDict[i].id === palletId) {
+        for (i = 0; palletArray.length > i; i += 1) {
+            if (palletArray[i].id === palletId) {
                 return true;
             }
         }
-        return false;
+        return false; */
     };
 }
 
@@ -96,10 +115,10 @@ app.post('/', function(req, res){
 
         // Pallet loaded event
     } else if (req.body.payload.PalletID) {
-        console.log(req.body);
+        //console.log(req.body);
         var key = req.body.payload.PalletID;
         //console.log("posted " + key);
-        updatePalletJSON(key);
+        updatePalletArray(key);
     } else {
         res.write("oh snap");
     }
@@ -141,14 +160,15 @@ function subscribeToEvents() {
 
 function logJSON() {
     console.log("\n DEBUG JSON FUNCTION IOT IOT IOT DASD DASD");
-    console.log("PalletDict: " + JSON.stringify(palletDict));
-    console.log("Array lenght: " + palletDict.length);
+    //console.log("PalletArray: " + JSON.stringify(palletArray));
+    console.log(palletArray);
+    //console.log("Array lenght: " + palletArray.length);
 
-    for (var i = 0; i < palletDict.length; i++) {
+    for (var i = 0; i < palletArray.length; i++) {
 
-        var thisId = palletDict[i];
+        var thisId = palletArray[i];
 
-        //console.log("looping throught the dict");
+        //console.log("looping throught the Array");
         //console.log(palletArray[i].toString());
         //var thisId = palletArray[i].toString();
         //console.log(thisId);
@@ -156,15 +176,15 @@ function logJSON() {
         //console.log("Type of palletarray[i] " + typeof palletArray[i]);
         //console.log("Index of " + thisId + " in palletarray: " + palletArray.indexOf(thisId));
 
-        console.log("Information about: " + thisId.id + " port " + thisId.port);
+        //console.log("Information about: " + thisId.id + " port " + thisId.port);
 
-        console.log(palletDict[i]);
-        console.log(palletDict[i+1]);
+        //console.log(palletArray[i]);
+        //console.log(palletArray[i+1]);
 
-        if (i >= 1 && palletDict[i].id == palletDict[i-1].id) {
-            console.log("Oh fuck, duplicate ids");
+        if (i >= 1 && palletArray[i].id == palletArray[i-1].id) {
+            //console.log("Oh fuck, duplicate ids");
         } else {
-            console.log("no multiple ids, good!");
+            //console.log("no multiple ids, good!");
         }
         //console.log("Index in palletarray: " + palletArray.indexOf(thisId));
         //thisId.printAll();
