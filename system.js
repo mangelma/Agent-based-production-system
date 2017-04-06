@@ -118,9 +118,11 @@ app.post('/', function(req, res){
         // Pallet loaded event
     } else if (req.body.id == 'PalletLoaded') {
         console.log("Palletloaded received");
+        console.log(req.body);
         var key = req.body.payload.PalletID;
         //console.log("posted " + key);
         updatePalletArray(key);
+        updatePalletInformation()
     } else {
         console.log("Unidentifiend post message with body: ");
         console.log(req.body);
