@@ -21,11 +21,17 @@
       <file leaf-file-name="robotcell.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/robotcell.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3939">
-              <caret line="235" column="30" lean-forward="true" selection-start-line="235" selection-start-column="30" selection-end-line="235" selection-end-column="30" />
+            <state relative-caret-position="2608">
+              <caret line="393" column="37" lean-forward="true" selection-start-line="393" selection-start-column="37" selection-end-line="393" selection-end-column="37" />
               <folding>
-                <marker date="1491496075881" expanded="false" signature="8619:8623" ph="{...}" />
-                <marker date="1491496075881" expanded="false" signature="8675:9455" ph="{...}" />
+                <element signature="e#4904#5564#0" expanded="false" />
+                <element signature="e#5629#6448#0" expanded="false" />
+                <element signature="e#6685#7060#0" expanded="false" />
+                <element signature="e#7184#8003#0" expanded="false" />
+                <element signature="e#8069#8639#0" expanded="false" />
+                <element signature="e#9011#9785#0" expanded="false" />
+                <element signature="e#9892#10539#0" expanded="false" />
+                <marker date="1491498730097" expanded="false" signature="8955:8959" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -34,11 +40,9 @@
       <file leaf-file-name="system.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/system.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-858">
+            <state relative-caret-position="-1188">
               <caret line="29" column="43" lean-forward="false" selection-start-line="29" selection-start-column="43" selection-end-line="29" selection-end-column="43" />
-              <folding>
-                <marker date="1491495898626" expanded="true" signature="4522:4528" ph="{...}" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -191,8 +195,8 @@
     </list>
     <recent_temporary>
       <list size="2">
-        <item index="0" class="java.lang.String" itemvalue="Node.js.robotcell.js" />
-        <item index="1" class="java.lang.String" itemvalue="Node.js.system.js" />
+        <item index="0" class="java.lang.String" itemvalue="Node.js.system.js" />
+        <item index="1" class="java.lang.String" itemvalue="Node.js.robotcell.js" />
       </list>
     </recent_temporary>
   </component>
@@ -208,12 +212,12 @@
       <updated>1491325586814</updated>
       <workItem from="1491325590887" duration="2466000" />
       <workItem from="1491384056440" duration="18367000" />
-      <workItem from="1491404666879" duration="30192000" />
+      <workItem from="1491404666879" duration="32710000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="51025000" />
+    <option name="totallyTimeSpent" value="53543000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1050" extended-state="6" />
@@ -223,7 +227,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3664036" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.35400227" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32919955" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -255,8 +259,14 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1491496075881" expanded="false" signature="8619:8623" ph="{...}" />
-            <marker date="1491496075881" expanded="false" signature="8675:9455" ph="{...}" />
+            <element signature="e#4904#5564#0" expanded="false" />
+            <element signature="e#5629#6448#0" expanded="false" />
+            <element signature="e#6685#7060#0" expanded="false" />
+            <element signature="e#7184#8003#0" expanded="false" />
+            <element signature="e#8069#8639#0" expanded="false" />
+            <element signature="e#9011#9785#0" expanded="false" />
+            <element signature="e#9892#10539#0" expanded="false" />
+            <marker date="1491498730097" expanded="false" signature="8955:8959" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -265,9 +275,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4202">
           <caret line="191" column="27" lean-forward="true" selection-start-line="191" selection-start-column="27" selection-end-line="191" selection-end-column="27" />
-          <folding>
-            <marker date="1491495898626" expanded="true" signature="4522:4528" ph="{...}" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -276,8 +284,14 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1491496075881" expanded="false" signature="8619:8623" ph="{...}" />
-            <marker date="1491496075881" expanded="false" signature="8675:9455" ph="{...}" />
+            <element signature="e#4904#5564#0" expanded="false" />
+            <element signature="e#5629#6448#0" expanded="false" />
+            <element signature="e#6685#7060#0" expanded="false" />
+            <element signature="e#7184#8003#0" expanded="false" />
+            <element signature="e#8069#8639#0" expanded="false" />
+            <element signature="e#9011#9785#0" expanded="false" />
+            <element signature="e#9892#10539#0" expanded="false" />
+            <marker date="1491498730097" expanded="false" signature="8955:8959" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -286,29 +300,31 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2442">
           <caret line="111" column="0" lean-forward="true" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
-          <folding>
-            <marker date="1491495898626" expanded="true" signature="4522:4528" ph="{...}" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/system.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-858">
+        <state relative-caret-position="-1188">
           <caret line="29" column="43" lean-forward="false" selection-start-line="29" selection-start-column="43" selection-end-line="29" selection-end-column="43" />
-          <folding>
-            <marker date="1491495898626" expanded="true" signature="4522:4528" ph="{...}" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/robotcell.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3939">
-          <caret line="235" column="30" lean-forward="true" selection-start-line="235" selection-start-column="30" selection-end-line="235" selection-end-column="30" />
+        <state relative-caret-position="2608">
+          <caret line="393" column="37" lean-forward="true" selection-start-line="393" selection-start-column="37" selection-end-line="393" selection-end-column="37" />
           <folding>
-            <marker date="1491496075881" expanded="false" signature="8619:8623" ph="{...}" />
-            <marker date="1491496075881" expanded="false" signature="8675:9455" ph="{...}" />
+            <element signature="e#4904#5564#0" expanded="false" />
+            <element signature="e#5629#6448#0" expanded="false" />
+            <element signature="e#6685#7060#0" expanded="false" />
+            <element signature="e#7184#8003#0" expanded="false" />
+            <element signature="e#8069#8639#0" expanded="false" />
+            <element signature="e#9011#9785#0" expanded="false" />
+            <element signature="e#9892#10539#0" expanded="false" />
+            <marker date="1491498730097" expanded="false" signature="8955:8959" ph="{...}" />
           </folding>
         </state>
       </provider>

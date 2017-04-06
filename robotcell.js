@@ -79,9 +79,15 @@ Robotcell.prototype.RunServer = function()
 
                 if(datatable[1] == 'Z1_Changed' && parseInt(datatable[8]) > 0 )
                 {
-                    console.log('ennen getpalletinformation')
                     ref.GetPalletInformation(datatable[8])
-                    console.log('jälkeen getpalletinformation')
+                }
+                else if(datatable[1] == 'Z2_Changed')
+                {
+                    ref.MovePallet('TransZone23')
+                }
+                else if(datatable[1] == 'Z3_Changed')
+                {
+                   console.log('robot starts working in '+ this.place)
                 }
                 else if(datatable[1] == 'Z4_Changed')
                 {
@@ -210,6 +216,15 @@ Robotcell.prototype.MakeJob = function (recept)
     console.log(reseptTable[3])
     console.log(reseptTable[4])
     console.log(reseptTable[5])
+    if(this.state == 'busy') {
+        this.MovePallet('Tranzone14')
+    }
+    else
+    {
+        this.MovePallet('TransZone12')
+
+    }
+
 
 
 }
@@ -234,8 +249,9 @@ Robotcell.prototype.UpdatePalletInformation = function () {
                 "kcolor" : 3,
                 "destination": 3,
                 "hasPaper" : 1
+            }
         }
-    };
+              };
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             //console.log(body.id) // Print the shortened url.
@@ -301,7 +317,7 @@ Robotcell.prototype.MovePallet = function (zone)
         json: {"destUrl": myIP+':'+port}
     };
     //http://localhost:3000/RTU/CNV*/services/TransZone14
-    console.log(fastIP + ':3000/RTU/SimCNV'+ this.place + '/services/TransZone14')
+    console.log(fastIP + ':3000/RTU/SimCNV'+ this.place + '/services/'+zone)
     console.log("destUrl :"+ myIP+':'+port)
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -363,8 +379,10 @@ var john = new Robotcell(8,'1');
 //john.GetPalletInformation();
 //john.RunServer();
 //john.SubscribeToCell('CNV','Z1_Changed')
+//john.SubscribeToCell('CNV','Z2_Changed')
+//john.SubscribeToCell('CNV','Z3_Changed')
 //john.SubscribeToCell('CNV','Z4_Changed')
-//john.MovePallet('TransZone14')
+//john.MovePallet('TransZone12')
 //john.MakeJob('0,0,0,0,0,0')
 //john.GetCellStates(8,'0,0,0,0,0,0')
 john.UpdatePalletInformation()
