@@ -67,7 +67,12 @@ function updatePalletArray(iidee) {
 };
 
 function updatePalletInformation(iidee, updatedInfo) {
-    palletArray[iidee] = updatedInfo;
+    // if we dont have this id in our array
+    if (!(iidee in palletArray)) {
+        console.log(iidee + " not found in palletArray, not updating");
+    } else {
+        palletArray[iidee] = updatedInfo;
+    }
 }
 
 function checkJSON(palletId) {
@@ -75,10 +80,6 @@ function checkJSON(palletId) {
     console.log("Checking uniqueness of: " + palletId);
 
     for (var i = 0; i < palletArray.length; i++) {
-
-        //var thisId = palletArray[i];
-        //console.log("Information about: " + thisId.id + " port " + thisId.port);
-        //console.log("Comparing: " + palletArray[i].id + " and " + palletArray[i-1].id);
 
         if ( i >= 1 && palletArray[i].id == palletArray[i-1].id ) {
             console.log("Comparing: " + palletArray[i].id + " and " + palletArray[i-1].id);
@@ -88,16 +89,6 @@ function checkJSON(palletId) {
             console.log("CHECK: no multiple ids, good!");
             return true;
         }
-
-    /*
-    var hasTag = function(palletId) {
-        var i = null;
-        for (i = 0; palletArray.length > i; i += 1) {
-            if (palletArray[i].id === palletId) {
-                return true;
-            }
-        }
-        return false; */
     };
 }
 
