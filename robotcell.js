@@ -243,7 +243,7 @@ Robotcell.prototype.UpdatePalletInformation = function () {
         console.log(response.body);
 
         //console.log(error)
-//sgfrftiopål
+
     });
     console.log('perkele')
 
