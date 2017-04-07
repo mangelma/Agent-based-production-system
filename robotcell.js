@@ -171,6 +171,7 @@ Robotcell.prototype.RunServer = function()
                                 {
                                     console.log('kolmas nolla')
                                     console.log('lähetetään paperin vaihtoon cell1')
+                                    i=4
 
                                 }
 
@@ -180,6 +181,7 @@ Robotcell.prototype.RunServer = function()
                         console.log(i)
                         while(true)
                         {
+
                             var apu =parseInt(statearr[0].split(",")[1])+4
                             console.log('apu'+apu)
                             console.log(statearr[0].split(",")[i])
