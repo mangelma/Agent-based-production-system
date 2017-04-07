@@ -13,7 +13,7 @@ var fastIP = 'http://localhost'
 var myIP = 'http://localhost' // komentoriville ipconfig
 var serverBasePort = 4000 // Base port plus cellnumber
 var statearr = [];
-var onlinecells = 2; //online robotcells miinus 1, ei lasketa 1 ja 7 cell
+var onlinecells = 9; //online robotcells miinus 1, ei lasketa 1 ja 7 cell
 
 
 var Robotcell = function Robotcell(place, job) {
@@ -104,7 +104,7 @@ Robotcell.prototype.RunServer = function()
                 }
                 else if(datatable[1] == 'DrawEndExecution')
                 {
-                    console.log('työ on piirretty')
+                    console.log('työ on piirretty'+ref.place)
                     ref.MovePallet('TransZone35')
                     ref.state = 'idle'
                 }
@@ -115,24 +115,25 @@ Robotcell.prototype.RunServer = function()
                     var passID = datatable[10]
                     ref.SendCellInfomation(datatable[1],passResepti, passID)
                 }
-                else if(datatable[4] == 'frame')
+                else if(datatable[0] == 'frame')
                 {
-                    console.log('meitte tuli tietoa palletista')
-                    var resepti = datatable[5]+","+datatable[7]+","+datatable[9]+","+datatable[11]+","+datatable[13]
-                        +","+datatable[15]
-                    if(datatable[13] == '0')
+                    console.log('meitte tuli tietoa palletista'+ref.place)
+                    var resepti = datatable[1]+","+datatable[3]+","+datatable[5]+","+datatable[7]+","+datatable[9]
+                        +","+datatable[11]
+                    if(datatable[13] == '0'|| datatable[15] == '0')
                     {
                         console.log('pallet on cell '+ref.place+'desideNExtDestination')
-                        ref.DecideNextPalletDestinaton(resepti, datatable[8])
+                        ref.DecideNextPalletDestinaton(resepti, datatable[17])
                     }
-                    else if(parseInt(datatable[17]) == ref.place)
+                    else if(parseInt(datatable[15]) == ref.place)
                     {
                         console.log('pallet on cell '+ref.place+'makeJOb')
-                        ref.MakeJob(resepti)
+                        console.log('makejobbiin menossa oleva id = ' +datatable[17])
+                        ref.MakeJob(resepti,datatable[17])
                     }
                     else
                     {
-                        console.log('pallet on cell '+ref.place+'ei kuulu meille skipataan')
+                        console.log('pallet in cell '+ref.place+'ei kuulu meille skipataan')
                         ref.MovePallet('TransZone14')
                     }
                     console.log(resepti)
@@ -141,7 +142,7 @@ Robotcell.prototype.RunServer = function()
                 if(datatable[0] == 'sendCellInfo')
                 {
                     console.log(statearr)
-                    console.log('cell infoa saatu')
+                    console.log('cell infoa saatu'+ref.place)
                     console.log(datatable[1]+","+datatable[2]+","+datatable[3]+","+datatable[4]+","+datatable[5]+
                     ","+datatable[6]+","+datatable[7]+","+datatable[8]+","+datatable[9]+","+datatable[10]+","+datatable[11]+
                         ","+datatable[12])
@@ -150,7 +151,7 @@ Robotcell.prototype.RunServer = function()
                     ","+datatable[12])
                     if(statearr.length > onlinecells)
                     {
-                        console.log('ny päätetään')
+                        console.log('ny päätetään'+ref.place)
                         console.log(statearr[0])
                         console.log(statearr[1])
                         console.log(statearr[2])
@@ -181,11 +182,11 @@ Robotcell.prototype.RunServer = function()
                         {
                             if(statearr[0].split(",")[1] == statearr[0].split(",")[i] )
                             {
-                                console.log('työtekiä löytynyt')
+                                console.log('työtekiä löytynyt'+ref.place)
 
                                 if(statearr[0].split(",")[3] == 'idle')
                                 {
-                                    console.log('työntekiä vapaana')
+                                    console.log('työntekiä vapaana'+ref.place)
                                     var uprecept = statearr[0].split(",")[5]+","+statearr[0].split(",")[6]+","+
                                         statearr[0].split(",")[7]+","+statearr[0].split(",")[8]+","+
                                         statearr[0].split(",")[9]+","+statearr[0].split(",")[10]
@@ -201,7 +202,7 @@ Robotcell.prototype.RunServer = function()
                                 }
                                 else
                                 {
-                                    console.log('työntekiä kiireinen')
+                                    console.log('työntekiä kiireinen'+ref.place)
                                     statearr.shift()
                                 }
                             }
@@ -210,7 +211,7 @@ Robotcell.prototype.RunServer = function()
                                 statearr.shift()
                                 if (statearr.length == 0)
                                 {
-                                    console.log('ei löytyny sopivaa työntekiää')
+                                    console.log('ei löytyny sopivaa työntekiää'+ref.place)
                                     ref.MovePallet('TransZone14')
                                     statearr = []
                                     break
@@ -279,7 +280,7 @@ Robotcell.prototype.GetPalletInformation = function (palletId, resepti)
 
     var destination= 0;
     request(options, function (error, response, body){
-        console.log('ny pyydetään tietoja palletista');
+        console.log('ny pyydetään tietoja palletista' + ref.place+ 'in zone1');
         if (!error && response.statusCode == 200) {
             console.log("palletin body =" + body); // Print the shortened url.
             //todo body parsetaan ja sieltä saadaan seuraavat tiedot
@@ -350,7 +351,7 @@ Robotcell.prototype.ChangePenColor = function (color)
 
     });
 }
-Robotcell.prototype.MakeJob = function (recept)
+Robotcell.prototype.MakeJob = function (recept,ID)
 {
 
     var reseptTable = recept.split(",")
@@ -366,6 +367,7 @@ Robotcell.prototype.MakeJob = function (recept)
         console.log('tehdään frame')
         this.jobModel = parseInt(reseptTable[0])
         console.log(this.jobModel)
+        reseptTable[0] = '0'
         if(reseptTable[3] == 'red')
         {
             console.log('vaihdetaan punainen kynä')
@@ -391,6 +393,7 @@ Robotcell.prototype.MakeJob = function (recept)
         console.log('tehdään screen')
         this.jobModel = parseInt(reseptTable[1])+3
         console.log(this.jobModel)
+        reseptTable[1] = '0'
         if(reseptTable[4] == 'red')
         {
             console.log('vaihdetaan punainen kynä')
@@ -416,6 +419,7 @@ Robotcell.prototype.MakeJob = function (recept)
         console.log('tehdään keyboard')
         this.jobModel = parseInt(reseptTable[2])+6
         console.log(this.jobModel)
+        reseptTable[2] = '0'
         if(reseptTable[5] == 'red')
         {
             console.log('vaihdetaan punainen kynä')
@@ -447,6 +451,10 @@ Robotcell.prototype.MakeJob = function (recept)
     else
     {
         this.MovePallet('TransZone12')
+        var uprecept = reseptTable[0]+','+reseptTable[1]+','+reseptTable[2]+','+reseptTable[3]+','+reseptTable[4]+','+reseptTable[5]
+        console.log(uprecept)
+        this.UpdatePalletInformation(uprecept,'0',ID)
+        console.log('makejob id = '+ID)
 
     }
 
@@ -473,6 +481,7 @@ Robotcell.prototype.UpdatePalletInformation = function (recept, destination, ID)
                 "fcolor" : uprecept[3],
                 "scolor" : uprecept[4],
                 "kcolor" : uprecept[5],
+                "hasPaper" : 1,
                 "destination": destination,
 
             }
@@ -493,7 +502,7 @@ Robotcell.prototype.UpdatePalletInformation = function (recept, destination, ID)
 }
 Robotcell.prototype.GetCellStates = function (cellPlace, recept, ID)
 {
-    console.log('ny pyydetään tietoja palletista');
+    console.log('ny pyydetään tietoja robotcelleistä'+ ID);
     var ref = this
     var cellport = serverBasePort+cellPlace
 
@@ -501,7 +510,7 @@ Robotcell.prototype.GetCellStates = function (cellPlace, recept, ID)
         uri: fastIP+':'+cellport,
         method: 'POST',
         json: {
-            "getCellinfo" : ""+cellPlace+"", "resepti": recept, "ID": ID
+            "getCellinfo" : ""+this.place+"", "resepti": recept, "ID": ID
         }
     };
 
@@ -523,9 +532,18 @@ Robotcell.prototype.GetCellStates = function (cellPlace, recept, ID)
 
 Robotcell.prototype.DecideNextPalletDestinaton = function (recept, ID) {
     console.log('ny päätetään seuraava pallet destination')
-    this.GetCellStates(9,recept,ID)
+    console.log('id = '+ID)
+
+    this.GetCellStates(2,recept,ID)
+    this.GetCellStates(3,recept,ID)
+    this.GetCellStates(4,recept,ID)
+    this.GetCellStates(5,recept,ID)
+    this.GetCellStates(6,recept,ID)
     this.GetCellStates(8,recept,ID)
+    this.GetCellStates(9,recept,ID)
     this.GetCellStates(10,recept,ID)
+    this.GetCellStates(11,recept,ID)
+    this.GetCellStates(12,recept,ID)
 
 
 }
@@ -537,7 +555,7 @@ Robotcell.prototype.SimulatePalletArrivesToCON1 = function (ID) {
         uri: fastIP+':'+cellport,
         method: 'POST',
         json: {
-            "id":"Z1_Changed","senderID":"SimCNV8","lastEmit":ID ,"payload":{"PalletID":ID},"clientData":""
+            "id":"Z1_Changed","senderID":"SimCNV"+this.place,"lastEmit":ID ,"payload":{"PalletID":ID},"clientData":""
             }
         };
     request(options, function (error, response, body) {
@@ -615,24 +633,47 @@ Robotcell.prototype.SendCellInfomation = function (cellPlace, resepti, ID)
 
 }
 //lähetä cell information pyydettäessä(state stack pencolor job)
+Robotcell.prototype.startcell = function () {
+    this.RunServer();
+    this.SubscribeToCell('CNV','Z1_Changed')
+    this.SubscribeToCell('CNV','Z2_Changed')
+    this.SubscribeToCell('CNV','Z3_Changed')
+    this.SubscribeToCell('CNV','Z4_Changed')
+    this.SubscribeToCell('ROB','DrawEndExecution')
 
+}
 
 
 
 //*** Class definition done. We can start with objects
-
-var john = new Robotcell(8,'1');
-var max = new Robotcell(9,'2');
-var joonas = new Robotcell(10,'3')
-
+var cell2 = new Robotcell(2,'1');
+var cell3 = new Robotcell(3,'1');
+var cell4 = new Robotcell(4,'1');
+var cell5 = new Robotcell(5,'2');
+var cell6 = new Robotcell(6,'2');
+var cell8 = new Robotcell(8,'2');
+var cell9 = new Robotcell(9,'3');
+var cell10 = new Robotcell(10,'3')
+var cell11 = new Robotcell(11,'3')
+var cell12 = new Robotcell(12,'3')
+cell2.startcell()
+cell3.startcell()
+cell4.startcell()
+cell5.startcell()
+cell6.startcell()
+cell8.startcell()
+cell9.startcell()
+cell10.startcell()
+cell11.startcell()
+cell12.startcell()
 //john.UpdatePalletInformation();
 //john.GetPalletInformation();
-john.RunServer();
-john.SubscribeToCell('CNV','Z1_Changed')
-john.SubscribeToCell('CNV','Z2_Changed')
-john.SubscribeToCell('CNV','Z3_Changed')
-john.SubscribeToCell('CNV','Z4_Changed')
-john.SubscribeToCell('ROB','DrawEndExecution')
+//john.RunServer();
+//john.SubscribeToCell('CNV','Z1_Changed')
+//john.SubscribeToCell('CNV','Z2_Changed')
+//john.SubscribeToCell('CNV','Z3_Changed')
+//john.SubscribeToCell('CNV','Z4_Changed')
+//john.SubscribeToCell('ROB','DrawEndExecution')
 //john.SimulatePalletArrivesToCON1(123)
 
 //john.MovePallet('TransZone12')
@@ -643,13 +684,20 @@ john.SubscribeToCell('ROB','DrawEndExecution')
 //john.UpdatePalletInformation()
 //john.ChangePenColor('RED')
 
-joonas.RunServer();
-max.RunServer();
-max.SubscribeToCell('CNV','Z1_Changed')
-max.SubscribeToCell('CNV','Z2_Changed')
-max.SubscribeToCell('CNV','Z3_Changed')
-max.SubscribeToCell('CNV','Z4_Changed')
-max.SubscribeToCell('ROB','DrawEndExecution')
+
+//max.RunServer();
+//max.SubscribeToCell('CNV','Z1_Changed')
+//max.SubscribeToCell('CNV','Z2_Changed')
+//max.SubscribeToCell('CNV','Z3_Changed')
+//max.SubscribeToCell('CNV','Z4_Changed')
+//max.SubscribeToCell('ROB','DrawEndExecution')
+
+//joonas.RunServer();
+//joonas.SubscribeToCell('CNV','Z1_Changed')
+//joonas.SubscribeToCell('CNV','Z2_Changed')
+//joonas.SubscribeToCell('CNV','Z3_Changed')
+//joonas.SubscribeToCell('CNV','Z4_Changed')
+//joonas.SubscribeToCell('ROB','DrawEndExecution')
 // Stating computations
 //var theResult = g.find("green", []);
 //console.log("Result: ", theResult);
