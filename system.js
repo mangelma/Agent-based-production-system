@@ -103,9 +103,9 @@ app.post('/', function(req, res){
         //console.log(askedPalletId);
         res.write("Hei ANTTI, ID jolta kysyit: ");
         res.write(JSON.stringify(req.body.palletInfo));
-        //console.log("Etsitty pallet: " + palletArray[req.body.palletInfo])
-        sendInfo(palletArray[req.body.palletInfo]);
-        res.write("Thank you for asking pallet info");
+        portti = req.body.portti;
+        sendInfo(palletArray[req.body.palletInfo], portti);
+        res.write("\n Thank you for asking pallet info");
 
         // Pallet loaded event
     } else if (req.body.id == 'PalletLoaded') {
@@ -157,12 +157,12 @@ app.post('/order', function(req, res){
     res.end('\n Order Received');
 });
 
-function sendInfo(message) {
+function sendInfo(message, portti) {
     //message = JSON.stringify(message);
     console.log("Sending information " + message);
     request.post({
         headers: {'content-type' : 'application/json'},
-        url: 'http://localhost:4008',
+        url: 'http://localhost:' + portti,
         form: message
             }, function(error, response, body){
             console.log(body);
@@ -180,6 +180,7 @@ function subscribeToEvents() {
         //console.log(httpResponse);
         });
 } // end of subscribe
+
 function invokePalletLoading(information) {
 
     //console.log("Invoking pallet loading...");
@@ -191,17 +192,19 @@ function invokePalletLoading(information) {
                 //console.log(body);
 
                 setTimeout(function() {
-                    console.log("Invoked palletarray:");
-                    console.log(palletArray);
+                    //console.log("Invoked palletarray:");
+                    //console.log(palletArray);
                     var length = Object.keys(palletArray).length;
                     console.log("lenght: " + length);
                     iidee = palletArray[Object.keys(palletArray)[length-1]];
                     console.log(Object.keys(palletArray)[length-1]);
-                    console.log("iidee: " + iidee);
-                    console.log(JSON.stringify(iidee));
+                    //console.log("iidee: " + iidee);
+                    //console.log(JSON.stringify(iidee));
                     console.log("iidee.rfid: " + iidee.rfid);
                     updatePalletInformation(iidee.rfid, information);
                 }, 5000);
+
+
 
                 //updatePalletInformation(iidee, information);
             }
