@@ -267,13 +267,13 @@ Robotcell.prototype.SubscribeToCell = function (robcon,funktion)
 Robotcell.prototype.GetPalletInformation = function (palletId, resepti)
 {
     var ref = this
-
+    var portti = serverBasePort+ref.place
 
     var options = {
         uri: fastIP+':4107',
         method: 'POST',
         json: {
-            "id" : "GetPalletInfo","palletInfo": ""+palletId+""
+            "id" : "GetPalletInfo","palletInfo": ""+palletId+"", "portti": portti
         }
     };
 
