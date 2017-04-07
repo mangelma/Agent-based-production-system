@@ -158,14 +158,14 @@ Robotcell.prototype.RunServer = function()
                         console.log(statearr[3])
                         console.log(statearr[4])
                         console.log(statearr[5])
-                        var i = 5
+                        var i = 1
                         if(statearr[0].split(",")[5] == '0')
                         {
                             console.log('eka nolla')
-                            i=6
+                            i=2
                             if(statearr[0].split(",")[6] == '0')
                             {
-                                i=7
+                                i=3
                                 console.log('toka nolla')
                                 if(statearr[0].split(",")[7] == '0')
                                 {
@@ -180,7 +180,10 @@ Robotcell.prototype.RunServer = function()
                         console.log(i)
                         while(true)
                         {
-                            if(statearr[0].split(",")[1] == statearr[0].split(",")[i] )
+                            var apu =parseInt(statearr[0].split(",")[1])+4
+                            console.log('apu'+apu)
+                            console.log(statearr[0].split(",")[i])
+                            if(parseInt(statearr[0].split(",")[1])== i )
                             {
                                 console.log('työtekiä löytynyt'+ref.place)
 
