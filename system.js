@@ -51,11 +51,10 @@ function updatePalletArray(iidee, initPallet) {
 
         if (!initPallet) {
             var initPallet = {
-                rfid: iidee,
-                port: 4100 + Object.keys(palletArray).length,
                 frame : 0, screen : 0, keyboard : 0,
                 fcolor : 0, scolor : 0, kcolor : 0,
-                destination: 0, hasPaper : 0
+                destination: 0, hasPaper : 0,
+                rfid: iidee
             };
         }
 
@@ -72,6 +71,8 @@ function updatePalletInformation(iidee, updatedInfo) {
     if (!(iidee in palletArray)) {
         console.log(iidee + " not found in palletArray, not updating");
     } else {
+        updatedInfo["rfid"] = iidee;
+        console.log("updatedInfo : " + JSON.stringify(updatedInfo));
         palletArray[iidee] = updatedInfo;
     }
 }
@@ -112,11 +113,10 @@ app.post('/', function(req, res){
         var key = req.body.payload.PalletID;
 
         var initPallet = {
-            rfid: key,
-            port: 4100 + Object.keys(palletArray).length,
             frame : 0, screen : 0, keyboard : 0,
             fcolor : 0, scolor : 0, kcolor : 0,
-            destination: 1, hasPaper : 0
+            destination: 1, hasPaper : 0,
+            rfid: key
         };
 
         updatePalletArray(key, initPallet);
@@ -126,6 +126,7 @@ app.post('/', function(req, res){
         var key = req.body.PalletID;
         var information = req.body.Information;
         console.log("updating " + key + " with information " + JSON.stringify(information));
+
         updatePalletInformation(key, information);
         res.write("Thank you for updating pallet information");
 
@@ -202,7 +203,7 @@ function invokePalletLoading(information) {
                     //console.log(JSON.stringify(iidee));
                     console.log("iidee.rfid: " + iidee.rfid);
                     updatePalletInformation(iidee.rfid, information);
-                }, 5000);
+                }, 2000);
 
 
 
