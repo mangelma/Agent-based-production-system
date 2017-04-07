@@ -19,6 +19,7 @@ var onlinecells = 2; //online robotcells miinus 1, ei lasketa 1 ja 7 cell
 var Robotcell = function Robotcell(place, job) {
     this.place = place;
     this.job = job;
+    this.jobModel = '1'
     this.penColor = 'red';
     this.state = 'idle';
     this.stack = 'false';
@@ -84,19 +85,28 @@ Robotcell.prototype.RunServer = function()
                 {
                     ref.GetPalletInformation(datatable[8])
                 }
-                else if(datatable[1] == 'Z2_Changed')
+                else if(datatable[1] == 'Z2_Changed' && parseInt(datatable[8]) > 0)
                 {
-                    console.log('pallet tuli zone2 cell '+this.place)
+                    ref.state = 'busy'
+                    console.log('pallet tuli zone2 cell '+ref.place)
                     ref.MovePallet('TransZone23')
                 }
-                else if(datatable[1] == 'Z3_Changed')
+                else if(datatable[1] == 'Z3_Changed'&& parseInt(datatable[8]) > 0)
                 {
-                   console.log('robot starts working in '+ this.place)
+                   console.log('robot starts working in '+ ref.place)
+                    ref.drawJob()
+
                 }
-                else if(datatable[1] == 'Z4_Changed')
+                else if(datatable[1] == 'Z4_Changed' && parseInt(datatable[8]) > 0)
                 {
-                    console.log('pallet tuli zone4 cell '+this.place)
+                    console.log('pallet tuli zone4 cell '+ref.place)
                     ref.MovePallet('TransZone45')
+                }
+                else if(datatable[1] == 'DrawEndExecution')
+                {
+                    console.log('työ on piirretty')
+                    ref.MovePallet('TransZone35')
+                    ref.state = 'idle'
                 }
                 else if(datatable[0] == 'getCellinfo')
                 {
@@ -112,17 +122,17 @@ Robotcell.prototype.RunServer = function()
                         +","+datatable[15]
                     if(datatable[17] == 0)
                     {
-                        console.log('pallet on cell '+this.place+'desideNExtDestination')
+                        console.log('pallet on cell '+ref.place+'desideNExtDestination')
                         ref.DecideNextPalletDestinaton(resepti, datatable[8])
                     }
-                    else if(parseInt(datatable[17]) == this.place)
+                    else if(parseInt(datatable[17]) == ref.place)
                     {
-                        console.log('pallet on cell '+this.place+'makeJOb')
+                        console.log('pallet on cell '+ref.place+'makeJOb')
                         ref.MakeJob(resepti)
                     }
                     else
                     {
-                        console.log('pallet on cell '+this.place+'ei kuulu meille skipataan')
+                        console.log('pallet on cell '+ref.place+'ei kuulu meille skipataan')
                         ref.MovePallet('TransZone14')
                     }
                     console.log(resepti)
@@ -205,7 +215,6 @@ Robotcell.prototype.RunServer = function()
                                 }
                             }
                         }
-
                     }
                 }
 
@@ -287,15 +296,57 @@ Robotcell.prototype.GetPalletInformation = function (palletId, resepti)
 }
 
 
-Robotcell.prototype.CheckDestination = function ()
+Robotcell.prototype.drawJob = function ()
 //vertaa palletdestionation ja cell plasea.
 {
+    console.log('piirretään')
+    port = this.place+serverBasePort
 
+    var options = {
+        uri: fastIP + ':3000/RTU/SimROB'+ this.place + '/services/Draw'+this.jobModel,
+        method: 'POST',
+        json: {"destUrl": myIP+':'+port}
+    };
+    //http://localhost:3000/RTU/CNV*/services/TransZone14
+    console.log(fastIP + ':3000/RTU/SimROB'+ this.place + '/services/Draw'+this.jobModel)
+    console.log("destUrl :"+ myIP+':'+port)
+    request(options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            //console.log(body.id) // Print the shortened url.
+            console.log(body)
+        }
+        else{
+            console.log('error ='+error)
+            console.log('statuscode ='+response.statusCode)
+        }
+
+    });
 }
-Robotcell.prototype.CheckOwnState = function ()
+Robotcell.prototype.ChangePenColor = function (color)
 //Tarkistaa oman jonon ja staten
 {
+    console.log('vaihdetaan kynän väri')
+    port = this.place+serverBasePort
 
+    var options = {
+        uri: fastIP + ':3000/RTU/SimROB'+ this.place + '/services/ChangePen'+color,
+        method: 'POST',
+        json: {"destUrl": myIP+':'+port}
+    };
+    //http://localhost:3000/RTU/CNV*/services/TransZone14
+    console.log(fastIP + ':3000/RTU/SimROB'+ this.place + '/services/ChangePen'+color)
+    console.log("destUrl :"+ myIP+':'+port)
+    request(options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            //console.log(body.id) // Print the shortened url.
+            console.log(body)
+        }
+        else{
+            console.log('error ='+error)
+            console.log('statuscode ='+response.statusCode)
+        }
+
+    });
 }
 Robotcell.prototype.MakeJob = function (recept)
 {
@@ -307,6 +358,87 @@ Robotcell.prototype.MakeJob = function (recept)
     console.log(reseptTable[3])
     console.log(reseptTable[4])
     console.log(reseptTable[5])
+
+    if(reseptTable[0] != '0')
+    {
+        console.log('tehdään frame')
+        this.jobModel = parseInt(reseptTable[0])
+        console.log(this.jobModel)
+        if(reseptTable[3] == 'red')
+        {
+            console.log('vaihdetaan punainen kynä')
+            this.ChangePenColor('RED')
+        }
+        else if(reseptTable[3] == 'blue')
+        {
+            console.log('vaihdetaan sininen kynä')
+            this.ChangePenColor('BLUE')
+        }
+        else if (reseptTable[3] == 'green')
+        {
+            console.log('vaihdetaan sininen kynä')
+            this.ChangePenColor('GREEN')
+        }
+        else
+        {
+            console.log('kynän väriä ei tunnistettu')
+        }
+    }
+    else if(reseptTable[1] != '0')
+    {
+        console.log('tehdään screen')
+        this.jobModel = parseInt(reseptTable[1])+3
+        console.log(this.jobModel)
+        if(reseptTable[4] == 'red')
+        {
+            console.log('vaihdetaan punainen kynä')
+            this.ChangePenColor('RED')
+        }
+        else if(reseptTable[4] == 'blue')
+        {
+            console.log('vaihdetaan sininen kynä')
+            this.ChangePenColor('BLUE')
+        }
+        else if (reseptTable[4] == 'green')
+        {
+            console.log('vaihdetaan sininen kynä')
+            this.ChangePenColor('GREEN')
+        }
+        else
+        {
+            console.log('kynän väriä ei tunnistettu')
+        }
+    }
+    else if(reseptTable[2] != '0')
+    {
+        console.log('tehdään keyboard')
+        this.jobModel = parseInt(reseptTable[2])+6
+        console.log(this.jobModel)
+        if(reseptTable[5] == 'red')
+        {
+            console.log('vaihdetaan punainen kynä')
+            this.ChangePenColor('RED')
+        }
+        else if(reseptTable[5] == 'blue')
+        {
+            console.log('vaihdetaan sininen kynä')
+            this.ChangePenColor('BLUE')
+        }
+        else if (reseptTable[5] == 'green')
+        {
+            console.log('vaihdetaan sininen kynä')
+            this.ChangePenColor('GREEN')
+        }
+        else
+        {
+            console.log('kynän väriä ei tunnistettu')
+        }
+    }
+    else
+    {
+        console.log('virhe on tapahtunut, kaikki työt on tehty jo')
+    }
+
     if(this.state == 'busy') {
         this.MovePallet('Tranzone14')
     }
@@ -475,27 +607,28 @@ var joonas = new Robotcell(10,'3')
 
 //john.UpdatePalletInformation();
 //john.GetPalletInformation();
-//john.RunServer();
-//john.SubscribeToCell('CNV','Z1_Changed')
-//john.SubscribeToCell('CNV','Z2_Changed')
-//john.SubscribeToCell('CNV','Z3_Changed')
-//john.SubscribeToCell('CNV','Z4_Changed')
+john.RunServer();
+john.SubscribeToCell('CNV','Z1_Changed')
+john.SubscribeToCell('CNV','Z2_Changed')
+john.SubscribeToCell('CNV','Z3_Changed')
+john.SubscribeToCell('CNV','Z4_Changed')
+john.SubscribeToCell('ROB','DrawEndExecution')
 
 
 //john.MovePallet('TransZone12')
-//john.MakeJob('0,0,0,0,0,0')
+john.MakeJob('0,3,3,blue,red,green')
 //john.GetCellStates(8,'3,0,0,0,0,0','213123212')
 //john.GetCellStates(9,'3,0,0,0,0,0','213123212')
 //john.GetCellStates(10,'3,0,0,0,0,0','213123212')
 //john.UpdatePalletInformation()
-
+//john.ChangePenColor('RED')
 
 //joonas.RunServer();
-max.RunServer();
-max.SubscribeToCell('CNV','Z1_Changed')
-max.SubscribeToCell('CNV','Z2_Changed')
-max.SubscribeToCell('CNV','Z3_Changed')
-max.SubscribeToCell('CNV','Z4_Changed')
+//max.RunServer();
+//max.SubscribeToCell('CNV','Z1_Changed')
+//max.SubscribeToCell('CNV','Z2_Changed')
+//max.SubscribeToCell('CNV','Z3_Changed')
+//max.SubscribeToCell('CNV','Z4_Changed')
 // Stating computations
 //var theResult = g.find("green", []);
 //console.log("Result: ", theResult);
