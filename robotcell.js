@@ -115,17 +115,17 @@ Robotcell.prototype.RunServer = function()
                     var passID = datatable[10]
                     ref.SendCellInfomation(datatable[1],passResepti, passID)
                 }
-                else if(datatable[4] == 'frame')
+                else if(datatable[0] == 'frame')
                 {
                     console.log('meitte tuli tietoa palletista')
-                    var resepti = datatable[5]+","+datatable[7]+","+datatable[9]+","+datatable[11]+","+datatable[13]
-                        +","+datatable[15]
-                    if(datatable[17] == 0)
+                    var resepti = datatable[1]+","+datatable[3]+","+datatable[5]+","+datatable[7]+","+datatable[9]
+                        +","+datatable[11]
+                    if(datatable[13] == '0')
                     {
                         console.log('pallet on cell '+ref.place+'desideNExtDestination')
                         ref.DecideNextPalletDestinaton(resepti, datatable[8])
                     }
-                    else if(parseInt(datatable[17]) == ref.place)
+                    else if(parseInt(datatable[13]) == ref.place)
                     {
                         console.log('pallet on cell '+ref.place+'makeJOb')
                         ref.MakeJob(resepti)
@@ -194,8 +194,9 @@ Robotcell.prototype.RunServer = function()
                                     console.log(uprecept)
                                     console.log(updestination)
                                     console.log(upID)
-                                    ref.UpdatePalletInformation(uprecept, updestination,upID)
-
+                                    ref.UpdatePalletInformation(uprecept, updestination, upID)
+                                    ref.SimulatePalletArrivesToCON1(upID)
+                                    statearr = []
                                     break
                                 }
                                 else
@@ -211,6 +212,7 @@ Robotcell.prototype.RunServer = function()
                                 {
                                     console.log('ei löytyny sopivaa työntekiää')
                                     this.MovePallet('TransZone14')
+                                    statearr = []
                                     break
                                 }
                             }
@@ -529,7 +531,25 @@ Robotcell.prototype.DecideNextPalletDestinaton = function (recept, ID) {
 }
 //päätä getcellstate tietojen pohjalta mihin pallet menee seuraavaksi
 
-Robotcell.prototype.SimulatePalletArrivesToCON1 = function () {
+Robotcell.prototype.SimulatePalletArrivesToCON1 = function (ID) {
+    var cellport = serverBasePort+this.place
+    var options = {
+        uri: fastIP+':'+cellport,
+        method: 'POST',
+        json: {
+            "id":"Z1_Changed","senderID":"SimCNV8","lastEmit":ID ,"payload":{"PalletID":ID},"clientData":""
+            }
+        };
+    request(options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            //console.log(body.id) // Print the shortened url.
+        }
+        console.log(response.body);
+
+        //console.log(error)
+//sgfrftiopål
+    });
+    console.log('perkele')
 
 }
 
@@ -613,22 +633,23 @@ john.SubscribeToCell('CNV','Z2_Changed')
 john.SubscribeToCell('CNV','Z3_Changed')
 john.SubscribeToCell('CNV','Z4_Changed')
 john.SubscribeToCell('ROB','DrawEndExecution')
-
+//john.SimulatePalletArrivesToCON1(123)
 
 //john.MovePallet('TransZone12')
-john.MakeJob('0,3,3,blue,red,green')
+//john.MakeJob('0,3,3,blue,red,green')
 //john.GetCellStates(8,'3,0,0,0,0,0','213123212')
 //john.GetCellStates(9,'3,0,0,0,0,0','213123212')
 //john.GetCellStates(10,'3,0,0,0,0,0','213123212')
 //john.UpdatePalletInformation()
 //john.ChangePenColor('RED')
 
-//joonas.RunServer();
-//max.RunServer();
-//max.SubscribeToCell('CNV','Z1_Changed')
-//max.SubscribeToCell('CNV','Z2_Changed')
-//max.SubscribeToCell('CNV','Z3_Changed')
-//max.SubscribeToCell('CNV','Z4_Changed')
+joonas.RunServer();
+max.RunServer();
+max.SubscribeToCell('CNV','Z1_Changed')
+max.SubscribeToCell('CNV','Z2_Changed')
+max.SubscribeToCell('CNV','Z3_Changed')
+max.SubscribeToCell('CNV','Z4_Changed')
+max.SubscribeToCell('ROB','DrawEndExecution')
 // Stating computations
 //var theResult = g.find("green", []);
 //console.log("Result: ", theResult);
