@@ -2,7 +2,8 @@
 NodeJS based assignment work for the TUT course Distributed Automation Systems
 
 ```javascript
-// Ordering. Using only parts and colors should work, but better to send also destination, hasPaper and rfid
+// orderInterface.js can be used to send this message
+// Using only parts and colors should work, but better to send also destination, hasPaper and rfid
 { "id" : "PlaceOrder",
       "Information" :
            {
