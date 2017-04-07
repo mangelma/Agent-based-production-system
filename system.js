@@ -96,9 +96,9 @@ app.post('/', function(req, res){
 
     // vastataan antille
     if (req.body.id == 'GetPalletInfo') {
-        console.log("GetPalletInfo received, with body of ");
-        console.log(req.body);
-        console.log("Asked palletID " + req.body.palletInfo);
+        //console.log("GetPalletInfo received, with body of ");
+        //console.log(req.body);
+        //console.log("Asked palletID " + req.body.palletInfo);
         //var askedPalletId = req.body.palletInfo;
         //console.log(askedPalletId);
         res.write("Hei ANTTI, ID jolta kysyit: ");
@@ -130,13 +130,91 @@ app.post('/', function(req, res){
         res.write("Thank you for updating pallet information");
 
         // unidentified posts
+    } else if (req.body.id == 'Z1_Changed') {
+
+        console.log(req.body);
+
+        var key = req.body.payload.PalletID;
+        console.log("Pallet " + key + " is at Zone 1 in " + req.body.senderID);
+
+        //updatePalletInformation(key, information);
+        try {
+            console.log("hasPaper: " + palletArray[key].hasPaper);
+        } catch (TypeError) {
+            console.log("PalletID is probably -1");
+        }
+
+
+
+
+        // jos ei paperi, ajetaan vaan kolmoselle saakka
+        // TODO: unload
+        if (palletArray[key].hasPaper == 0) {
+
+            movePallet(12);
+
+            setTimeout(function() {
+                movePallet(23);
+
+            }, 3000);
+        }
+
+
+        // jos paperi: pistetään ohi
+        if (palletArray[key].hasPaper == 1) {
+
+            movePallet(12);
+
+            setTimeout(function() {
+                movePallet(23);
+
+                setTimeout(function() {
+                    movePallet(35);
+                }, 3000);
+
+            }, 3000);
+
+
+
+            //transZone12
+            //transZone23
+            //transZone35
+        }
+
+
+
+
+
+
+        res.write("Thank you for updating pallet information");
+
+        // unidentified posts
     } else {
-        //console.log("ROOT Unidentifiend post message with body: ");
-        //console.log(req);
+        console.log("ROOT Unidentifiend post message with body: ");
+        console.log(req.body);
         res.write("oh snap");
     }
     res.end('\n Information Exhange Sequence End');
 });
+
+
+function movePallet(zone) {
+
+    var options = {
+        uri: "http://localhost:3000/RTU/SimCNV7/services/TransZone" + zone,
+        method: 'POST',
+        json: {"destUrl": "http://localhost:" + port}
+    };
+
+    request(options, function (error, response, body) {
+        if (!error) {
+            console.log(body);
+        }
+        else{
+            console.log('error');
+        }
+    });
+};
 
 // Order message handling
 app.post('/order', function(req, res){
@@ -158,7 +236,7 @@ app.post('/order', function(req, res){
 
 function sendInfo(message, portti) {
     //message = JSON.stringify(message);
-    console.log("Sending information " + message);
+    //console.log("Sending information " + message);
     request.post({
         headers: {'content-type' : 'application/json'},
         url: 'http://localhost:' + portti,
@@ -174,9 +252,25 @@ function subscribeToEvents() {
     console.log("Subscribed to PalletLoaded!");
     request.post('http://localhost:3000/RTU/SimROB7/events/PalletLoaded/notifs',
         {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
-        //console.log(err);
-        //console.log(body);
-        //console.log(httpResponse);
+            //console.log(err);
+            //console.log(body);
+            //console.log(httpResponse);
+        });
+
+    console.log("Subscribed to CNV7 zone1 changed");
+    request.post('http://localhost:3000/RTU/SimCNV7/events/Z1_Changed/notifs',
+        {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
+            //console.log(err);
+            //console.log(body);
+            //console.log(httpResponse);
+        });
+
+    console.log("Subscribed to CNV8 zone1 changed");
+    request.post('http://localhost:3000/RTU/SimCNV8/events/Z1_Changed/notifs',
+        {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
+            //console.log(err);
+            //console.log(body);
+            //console.log(httpResponse);
         });
 }
 
@@ -213,7 +307,7 @@ function invokePalletLoading(information) {
                                 console.log(err);
                             }
                         })
-                }, 3000);
+                }, 2000);
 
 
                 //updatePalletInformation(iidee, information);
@@ -241,4 +335,4 @@ app.get('/', function(req, res){
 });
 
 subscribeToEvents();
-setInterval(logJSON, 15000);
+//setInterval(logJSON, 15000);
