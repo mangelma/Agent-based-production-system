@@ -47,7 +47,7 @@ function updatePalletArray(iidee, initPallet) {
     //console.log("exist " + iidee in palletArray);
     // if we dont yet have this id in our array
     if (!(iidee in palletArray)) {
-        console.log("New pallet, adding it to array " + iidee);
+        //console.log("New pallet, adding it to array " + iidee);
 
         if (!initPallet) {
             var initPallet = {
@@ -57,7 +57,6 @@ function updatePalletArray(iidee, initPallet) {
                 rfid: iidee
             };
         }
-
         palletArray[iidee] = initPallet;
         //console.log("updated " + JSON.stringify(palletArray));
     } else {
@@ -132,8 +131,8 @@ app.post('/', function(req, res){
 
         // unidentified posts
     } else {
-        console.log("Unidentifiend post message with body: ");
-        console.log(req.body);
+        //console.log("ROOT Unidentifiend post message with body: ");
+        //console.log(req);
         res.write("oh snap");
     }
     res.end('\n Information Exhange Sequence End');
@@ -151,9 +150,8 @@ app.post('/order', function(req, res){
         res.write("Thank you for placing order");
 
     } else {
-        console.log("Unidentifiend post message with body: ");
-        console.log(req.body);
-        res.write("oh snap");
+        console.log("/order received unidentifiend post message with body: " + req.body);
+        res.write("what the fuck? send proper POSTs");
     }
     res.end('\n Order Received');
 });
@@ -166,10 +164,10 @@ function sendInfo(message, portti) {
         url: 'http://localhost:' + portti,
         form: message
             }, function(error, response, body){
-            console.log(body);
+            //console.log(body);
             if (error) { console.log(error); };
         });
-} // end of subscribe
+}
 function subscribeToEvents() {
     // initialize also the WS7 here
     //WS7.init();
@@ -180,11 +178,10 @@ function subscribeToEvents() {
         //console.log(body);
         //console.log(httpResponse);
         });
-} // end of subscribe
+}
 
 function invokePalletLoading(information) {
-
-    //console.log("Invoking pallet loading...");
+    console.log("Invoking pallet loading and waiting for 2 seconds");
     request.post('http://localhost:3000/RTU/SimROB7/services/LoadPallet',
         {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
             if(err) {
@@ -196,15 +193,27 @@ function invokePalletLoading(information) {
                     //console.log("Invoked palletarray:");
                     //console.log(palletArray);
                     var length = Object.keys(palletArray).length;
-                    console.log("lenght: " + length);
+                    //console.log("lenght: " + length);
                     iidee = palletArray[Object.keys(palletArray)[length-1]];
-                    console.log(Object.keys(palletArray)[length-1]);
+                    //console.log(Object.keys(palletArray)[length-1]);
                     //console.log("iidee: " + iidee);
                     //console.log(JSON.stringify(iidee));
-                    console.log("iidee.rfid: " + iidee.rfid);
-                    updatePalletInformation(iidee.rfid, information);
+                    //console.log("iidee.rfid: " + iidee.rfid);
+                    try { updatePalletInformation(iidee.rfid, information);
+                    } catch (TypeError) {
+                        console.log("check simulator events");
+                    }
+
                 }, 2000);
 
+                setTimeout(function() {
+                    request.post('http://localhost:3000/RTU/SimCNV7/services/TransZone35',
+                        {form: {destUrl: "http://localhost:" + port}}, function (err, httpResponse, body) {
+                            if (err) {
+                                console.log(err);
+                            }
+                        })
+                }, 3000);
 
 
                 //updatePalletInformation(iidee, information);
