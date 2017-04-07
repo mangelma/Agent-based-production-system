@@ -44,7 +44,7 @@ app.get('/', function(req, res){
     res.write("<button type='submit' value='Order phone'><h1>Order phone</h1></button>");
     res.write("</form>");
     sendOrder();
-    res.end('yes this is is ordering system, make GET request to /order');
+    res.end('GET /, push button or F5');
     console.log("get received \n");
 });
 
@@ -54,7 +54,7 @@ app.get('/', function(req, res){
  <input type="file" name="xmlFile">
  <input type="submit" value="Validate!">
  </form>
- */
+
 
 app.get('/order', function(req, res){
     res.statusCode = 200;
@@ -63,3 +63,4 @@ app.get('/order', function(req, res){
     sendOrder();
     console.log("get received \n");
 });
+*/
