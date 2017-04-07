@@ -115,17 +115,17 @@ Robotcell.prototype.RunServer = function()
                     var passID = datatable[10]
                     ref.SendCellInfomation(datatable[1],passResepti, passID)
                 }
-                else if(datatable[0] == 'frame')
+                else if(datatable[4] == 'frame')
                 {
                     console.log('meitte tuli tietoa palletista')
-                    var resepti = datatable[1]+","+datatable[3]+","+datatable[5]+","+datatable[7]+","+datatable[9]
-                        +","+datatable[11]
+                    var resepti = datatable[5]+","+datatable[7]+","+datatable[9]+","+datatable[11]+","+datatable[13]
+                        +","+datatable[15]
                     if(datatable[13] == '0')
                     {
                         console.log('pallet on cell '+ref.place+'desideNExtDestination')
                         ref.DecideNextPalletDestinaton(resepti, datatable[8])
                     }
-                    else if(parseInt(datatable[13]) == ref.place)
+                    else if(parseInt(datatable[17]) == ref.place)
                     {
                         console.log('pallet on cell '+ref.place+'makeJOb')
                         ref.MakeJob(resepti)
@@ -211,7 +211,7 @@ Robotcell.prototype.RunServer = function()
                                 if (statearr.length == 0)
                                 {
                                     console.log('ei löytyny sopivaa työntekiää')
-                                    this.MovePallet('TransZone14')
+                                    ref.MovePallet('TransZone14')
                                     statearr = []
                                     break
                                 }
