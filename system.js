@@ -132,8 +132,8 @@ app.post('/', function(req, res){
 
         // unidentified posts
     } else {
-        console.log("Unidentifiend post message with body: ");
-        console.log(req.body);
+        console.log("ROOT Unidentifiend post message with body: ");
+        //console.log(req);
         res.write("oh snap");
     }
     res.end('\n Information Exhange Sequence End');
@@ -151,9 +151,8 @@ app.post('/order', function(req, res){
         res.write("Thank you for placing order");
 
     } else {
-        console.log("Unidentifiend post message with body: ");
-        console.log(req.body);
-        res.write("oh snap");
+        console.log("/order received unidentifiend post message with body: " + req.body);
+        res.write("what the fuck? send proper POSTs");
     }
     res.end('\n Order Received');
 });
@@ -166,7 +165,7 @@ function sendInfo(message, portti) {
         url: 'http://localhost:' + portti,
         form: message
             }, function(error, response, body){
-            console.log(body);
+            //console.log(body);
             if (error) { console.log(error); };
         });
 } // end of subscribe
@@ -196,12 +195,12 @@ function invokePalletLoading(information) {
                     //console.log("Invoked palletarray:");
                     //console.log(palletArray);
                     var length = Object.keys(palletArray).length;
-                    console.log("lenght: " + length);
+                    //console.log("lenght: " + length);
                     iidee = palletArray[Object.keys(palletArray)[length-1]];
-                    console.log(Object.keys(palletArray)[length-1]);
+                    //console.log(Object.keys(palletArray)[length-1]);
                     //console.log("iidee: " + iidee);
                     //console.log(JSON.stringify(iidee));
-                    console.log("iidee.rfid: " + iidee.rfid);
+                    //console.log("iidee.rfid: " + iidee.rfid);
                     updatePalletInformation(iidee.rfid, information);
                 }, 2000);
 
