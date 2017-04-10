@@ -114,7 +114,7 @@ app.post('/', function(req, res){
         try {
             //console.log("hasPaper: " + palletArray[key].hasPaper);
             // jos ei paperi, ajetaan vaan kolmoselle saakka
-            // TODO: TESTAA UNLOAD
+            // TODO: TESTAA UNLOAD ja käytä eventteja
             if (palletArray[key].hasPaper == 0) {
                 movePallet(12);
                 setTimeout(function() {
@@ -126,12 +126,11 @@ app.post('/', function(req, res){
 
                 }, 3000);
             }
-            // jos paperi: pistetään ohi
+            // TODO: use events, not timers
             if (palletArray[key].hasPaper == 1) {
                 movePallet(12);
                 setTimeout(function() {
                     movePallet(23);
-
                     setTimeout(function() {
                         movePallet(35);
                     }, 3000);

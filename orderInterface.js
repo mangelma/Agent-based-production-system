@@ -9,6 +9,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var tilaus;
 
+// JSON-order is sent here
 function send(order) {
     request.post({
         headers: { "content-type" : "application/json" },
@@ -20,26 +21,18 @@ function send(order) {
     });
 }
 
+// listening to port 4099
 http.listen(port, function(){
-    console.log('The order machine is listening to ' + port);
+    console.log('The order gateway is listening to ' + port);
     console.log('\n');
 });
 
-// GET message handling, if we want to show something on the browser
+// GET sends index.html
 app.get('/', function(req, res){
-    /*res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/html');
-    res.write("<form method='get' action='/'>");
-    res.write("<button type='submit' value='Order phone'><h1>Order phone</h1></button>");
-    res.write("</form>");
-    res.write("<h1>PHONE ORDERING SYSTEM</h1>");
-    res.write(tilaus.toString());
-    sendOrder();
-    res.end('GET /, push button or F5');
-    console.log("get received \n"); */
     res.sendFile(__dirname + '/index.html');
 });
 
+// Socket.io magic happens here
 io.on('connection', function(socket){
     socket.on('chat message', function(order){
         console.log('order: ' + JSON.stringify(order));
@@ -47,8 +40,10 @@ io.on('connection', function(socket){
     });
 });
 
+// POSTs handled here, no functionality yet
 app.post('/', function(req, res){
-    console.log(req.body);
+    //console.log(req.body);
     tilaus = req.body;
+    console.log(tilaus);
     res.end('\n ordering system received information');
 });

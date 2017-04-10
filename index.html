@@ -39,9 +39,9 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
             <select name="framecolor">
                 <option selected disabled>Color</option>
-                <option value="r" selected="selected">Red</option>
-                <option value="g">Green</option>
-                <option value="b">Blue</option>
+                <option value="red" selected="selected">Red</option>
+                <option value="green">Green</option>
+                <option value="blue">Blue</option>
             </select>
 
             <p><label><i class="fa fa-mobile-phone"></i> Keyboard Options</label></p>
@@ -54,9 +54,9 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
             <select name="keyboardcolor">
                 <option selected disabled>Color</option>
-                <option value="r">Red</option>
-                <option value="g" selected="selected">Green</option>
-                <option value="b">Blue</option>
+                <option value="red">Red</option>
+                <option value="green" selected="selected">Green</option>
+                <option value="blue">Blue</option>
             </select>
 
             <p><label><i class="fa fa-mobile-phone"></i> Screen Options</label></p>
@@ -69,9 +69,9 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
             <select name="screencolor">
                 <option selected disabled>Color</option>
-                <option value="r">Red</option>
-                <option value="g">Green</option>
-                <option value="b" selected="selected">Blue</option>
+                <option value="red">Red</option>
+                <option value="green">Green</option>
+                <option value="blue" selected="selected">Blue</option>
             </select>
 
             <p><label><i class="fa fa-mobile-phone"></i> Amount</label></p>
@@ -89,6 +89,10 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 <script>
+
+    // TODO: tyhjennä välimuisti aina tilauksen jälkeen tms
+    // nyt lähtee niin monta tilausta kun nappia on painettu tms
+
     function addToOrder() {
 
         var order =
