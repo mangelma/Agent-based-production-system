@@ -76,127 +76,79 @@ function updatePalletInformation(iidee, updatedInfo) {
     }
 }
 
-function checkJSON(palletId) {
-    console.log("Checking uniqueness of: " + palletId);
-    for (var i = 0; i < palletArray.length; i++) {
-        if ( i >= 1 && palletArray[i].id == palletArray[i-1].id ) {
-            console.log("Comparing: " + palletArray[i].id + " and " + palletArray[i-1].id);
-            console.log("CHECK: Oh fuck, duplicate ids");
-            return false;
-        } else {
-            console.log("CHECK: no multiple ids, good!");
-            return true;
-        }
-    };
-}
-
-// POST message handling
 app.post('/', function(req, res){
     //console.log(req.body.id + " received!");
 
-    // vastataan antille
+    // Workcells are asking information about pallets
     if (req.body.id == 'GetPalletInfo') {
-        //console.log("GetPalletInfo received, with body of ");
-        //console.log(req.body);
-        //console.log("Asked palletID " + req.body.palletInfo);
-        //var askedPalletId = req.body.palletInfo;
-        //console.log(askedPalletId);
-        res.write("Hei ANTTI, ID jolta kysyit: ");
-        res.write(JSON.stringify(req.body.palletInfo));
+        res.write("Hello Workcell");
+        //res.write(JSON.stringify(req.body.palletInfo));
         portti = req.body.portti;
-        sendInfo(palletArray[req.body.palletInfo], portti);
+        requestedid = palletArray[req.body.palletInfo];
+        sendInfo(requestedid, portti);
+        logJSON();
         res.write("\n Thank you for asking pallet info");
 
-        // Pallet loaded event
     } else if (req.body.id == 'PalletLoaded') {
         var key = req.body.payload.PalletID;
-
         var initPallet = {
             frame : 0, screen : 0, keyboard : 0,
             fcolor : 0, scolor : 0, kcolor : 0,
             destination: 1, hasPaper : 0,
             rfid: key
         };
-
         updatePalletArray(key, initPallet);
-        res.write("Thank you for loading a pallet");
+        res.write("\n Thank you for loading a pallet");
 
     } else if (req.body.id == 'UpdatePalletInformation') {
         var key = req.body.PalletID;
         var information = req.body.Information;
         console.log("updating " + key + " with information " + JSON.stringify(information));
-
         updatePalletInformation(key, information);
-        res.write("Thank you for updating pallet information");
+        res.write("\n Thank you for updating pallet information");
 
-        // unidentified posts
     } else if (req.body.id == 'Z1_Changed') {
-
-        console.log(req.body);
-
+        //console.log(req.body);
         var key = req.body.payload.PalletID;
-        console.log("Pallet " + key + " is at Zone 1 in " + req.body.senderID);
-
-        //updatePalletInformation(key, information);
+        //console.log("Pallet " + key + " is at Zone 1 in " + req.body.senderID);
         try {
-            console.log("hasPaper: " + palletArray[key].hasPaper);
-        } catch (TypeError) {
-            console.log("PalletID is probably -1");
-        }
-
-
-
-
-        // jos ei paperi, ajetaan vaan kolmoselle saakka
-        // TODO: unload
-        if (palletArray[key].hasPaper == 0) {
-
-            movePallet(12);
-
-            setTimeout(function() {
-                movePallet(23);
-
-            }, 3000);
-        }
-
-
-        // jos paperi: pistetään ohi
-        if (palletArray[key].hasPaper == 1) {
-
-            movePallet(12);
-
-            setTimeout(function() {
-                movePallet(23);
-
+            //console.log("hasPaper: " + palletArray[key].hasPaper);
+            // jos ei paperi, ajetaan vaan kolmoselle saakka
+            // TODO: TESTAA UNLOAD
+            if (palletArray[key].hasPaper == 0) {
+                movePallet(12);
                 setTimeout(function() {
-                    movePallet(35);
+                    movePallet(23);
+
+                    setTimeout(function() {
+                        invokePalletUnloading();
+                    }, 3000);
+
                 }, 3000);
+            }
+            // jos paperi: pistetään ohi
+            if (palletArray[key].hasPaper == 1) {
+                movePallet(12);
+                setTimeout(function() {
+                    movePallet(23);
 
-            }, 3000);
-
-
-
-            //transZone12
-            //transZone23
-            //transZone35
+                    setTimeout(function() {
+                        movePallet(35);
+                    }, 3000);
+                }, 3000);
+            }
+        } catch (TypeError) {
+            //console.log("PalletID is probably -1");
         }
-
-
-
-
-
-
         res.write("Thank you for updating pallet information");
-
         // unidentified posts
     } else {
-        console.log("ROOT Unidentifiend post message with body: ");
-        console.log(req.body);
+        //console.log("ROOT Unidentifiend post message with body: ");
+        //console.log(req.body);
         res.write("oh snap");
     }
     res.end('\n Information Exhange Sequence End');
 });
-
 
 function movePallet(zone) {
 
@@ -208,10 +160,10 @@ function movePallet(zone) {
 
     request(options, function (error, response, body) {
         if (!error) {
-            console.log(body);
+            //console.log(body);
         }
         else{
-            console.log('error');
+            //console.log('error');
         }
     });
 };
@@ -225,6 +177,7 @@ app.post('/order', function(req, res){
         console.log("Making order with information " + JSON.stringify(information));
         //updatePalletInformation(key, information);
         invokePalletLoading(information);
+
         res.write("Thank you for placing order");
 
     } else {
@@ -246,36 +199,50 @@ function sendInfo(message, portti) {
             if (error) { console.log(error); };
         });
 }
+
 function subscribeToEvents() {
     // initialize also the WS7 here
     //WS7.init();
-    console.log("Subscribed to PalletLoaded!");
+
     request.post('http://localhost:3000/RTU/SimROB7/events/PalletLoaded/notifs',
         {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
-            //console.log(err);
-            //console.log(body);
-            //console.log(httpResponse);
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Subscribed to PalletLoaded!");
+            }
         });
 
-    console.log("Subscribed to CNV7 zone1 changed");
     request.post('http://localhost:3000/RTU/SimCNV7/events/Z1_Changed/notifs',
         {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
-            //console.log(err);
-            //console.log(body);
-            //console.log(httpResponse);
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Subscribed to CNV7 Zone1");
+            }
         });
 
-    console.log("Subscribed to CNV8 zone1 changed");
     request.post('http://localhost:3000/RTU/SimCNV8/events/Z1_Changed/notifs',
         {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
-            //console.log(err);
-            //console.log(body);
-            //console.log(httpResponse);
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Subscribed to CNV8 Z1");
+            }
         });
 }
 
 function invokePalletLoading(information) {
     console.log("Invoking pallet loading and waiting for 2 seconds");
+
+    request.post('http://localhost:4099',
+        {form: {info: information}}, function (err, httpResponse, body) {
+            if (err) {
+                console.log(err);
+            }
+        })
+
+
     request.post('http://localhost:3000/RTU/SimROB7/services/LoadPallet',
         {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
             if(err) {
@@ -283,23 +250,17 @@ function invokePalletLoading(information) {
             } else {
                 //console.log(body);
 
+                // waiting for 2 seconds before trying to access palletArray
                 setTimeout(function() {
-                    //console.log("Invoked palletarray:");
-                    //console.log(palletArray);
                     var length = Object.keys(palletArray).length;
-                    //console.log("lenght: " + length);
                     iidee = palletArray[Object.keys(palletArray)[length-1]];
-                    //console.log(Object.keys(palletArray)[length-1]);
-                    //console.log("iidee: " + iidee);
-                    //console.log(JSON.stringify(iidee));
-                    //console.log("iidee.rfid: " + iidee.rfid);
                     try { updatePalletInformation(iidee.rfid, information);
                     } catch (TypeError) {
                         console.log("check simulator events");
                     }
-
                 }, 2000);
 
+                // after two seconds we are also transzoning the loaded pallet from 3 to 5
                 setTimeout(function() {
                     request.post('http://localhost:3000/RTU/SimCNV7/services/TransZone35',
                         {form: {destUrl: "http://localhost:" + port}}, function (err, httpResponse, body) {
@@ -308,18 +269,24 @@ function invokePalletLoading(information) {
                             }
                         })
                 }, 2000);
-
-
-                //updatePalletInformation(iidee, information);
             }
         });
 }
+
+function invokePalletUnloading() {
+    request.post('http://localhost:3000/RTU/SimROB7/services/UnloadPallet',
+        {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
+            if(err) {
+                console.log(err);
+            }
+        });
+};
 
 function logJSON() {
     console.log("\n " + Object.keys(palletArray).length + " Pallets in Array");
     console.log(palletArray);
 } // end of debugging log
-
+//setInterval(logJSON, 5000);
 
 http.listen(port, function(){
     console.log('The Agent WS7 is listening in ' + port);
@@ -335,4 +302,3 @@ app.get('/', function(req, res){
 });
 
 subscribeToEvents();
-//setInterval(logJSON, 15000);
