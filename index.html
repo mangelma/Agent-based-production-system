@@ -118,7 +118,8 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             var socket = io();
             $('form').submit(function(){
                 socket.emit('chat message', order);
-                $('#m').val('');
+                //$(order).val('');
+                order = 0;
                 return false;
             });
         });

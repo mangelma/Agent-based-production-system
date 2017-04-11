@@ -16,8 +16,8 @@ function send(order) {
         url: 'http://localhost:4107/order',
         json: order
     }, function(error, response, body){
-        console.log(body);
-        if (error) { console.log(error); };
+        //console.log(body);
+        if (error) { console.log(error); }
     });
 }
 
@@ -35,8 +35,7 @@ app.get('/', function(req, res){
 // Socket.io magic happens here
 io.on('connection', function(socket){
     socket.on('chat message', function(order){
-        console.log('order: ' + JSON.stringify(order));
-        send(order);
+        if (order != "0") { send(order); console.log("Order: "); console.log(order); }
     });
 });
 
@@ -47,3 +46,36 @@ app.post('/', function(req, res){
     console.log(tilaus);
     res.end('\n ordering system received information');
 });
+
+
+function subscribeToEvents() {
+
+    request.post('http://localhost:3000/RTU/SimCNV8/events/Z1_Changed/notifs',
+        {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Subscribed to CNV8 Zone1");
+            }
+        });
+
+    request.post('http://localhost:3000/RTU/SimCNV8/events/Z2_Changed/notifs',
+        {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Subscribed to CNV8 Zone2!");
+            }
+        });
+
+    request.post('http://localhost:3000/RTU/SimCNV8/events/Z3_Changed/notifs',
+        {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Subscribed to CNV8 Zone3");
+            }
+        });
+}
+
+subscribeToEvents();

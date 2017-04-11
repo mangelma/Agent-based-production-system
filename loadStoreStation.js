@@ -8,7 +8,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var port = 4107; // port for listening
 var palletArray = {}; // JSON for storing pallets and orders on them
-var debugging = false;
+var debugging = true;
 
 function subscribeToEvents() {
 
@@ -186,9 +186,15 @@ app.post('/', function(req, res){
 
         // Zone 1 event handling here
     } else if (req.body.id == 'Z1_Changed') {
-        movePallet(12);
+        var key = req.body.payload.PalletID;
+        if (key != "-1") {
+            movePallet(12);
+        }
     } else if (req.body.id == 'Z2_Changed') {
-        movePallet(23);
+        var key = req.body.payload.PalletID;
+        if (key != "-1") {
+            movePallet(23);
+        }
     } else if (req.body.id == 'Z3_Changed') {
 
         var key = req.body.payload.PalletID;
