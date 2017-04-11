@@ -11,8 +11,15 @@ var palletArray = {}; // JSON for storing pallets and orders on them
 var debugging = false;
 
 function subscribeToEvents() {
-    // initialize also the WS7 here
-    //WS7.init();
+
+    request.post('http://localhost:3000/RTU/reset',
+        {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("POST to /RTU/reset");
+            }
+        });
 
     request.post('http://localhost:3000/RTU/SimROB7/events/PalletLoaded/notifs',
         {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
@@ -32,12 +39,21 @@ function subscribeToEvents() {
             }
         });
 
-    request.post('http://localhost:3000/RTU/SimCNV8/events/Z1_Changed/notifs',
+    request.post('http://localhost:3000/RTU/SimCNV7/events/Z3_Changed/notifs',
         {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
             if (err) {
                 console.log(err);
             } else {
-                console.log("Subscribed to CNV8 Z1");
+                console.log("Subscribed to CNV7 Zone3!");
+            }
+        });
+
+    request.post('http://localhost:3000/RTU/SimCNV7/events/Z2_Changed/notifs',
+        {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Subscribed to CNV7 Zone2");
             }
         });
 }
@@ -85,55 +101,36 @@ function sendInfo(message, portti) {
 
 function invokePalletLoading(information) {
     console.log("Invoking pallet loading and waiting for 2 seconds");
-
-    request.post('http://localhost:4099',
-        {form: {info: information}}, function (err, httpResponse, body) {
-            if (err) {
-                console.log(err);
-            }
-        })
-
-
     request.post('http://localhost:3000/RTU/SimROB7/services/LoadPallet',
         {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
             if(err) {
                 console.log(err);
             } else {
-                //console.log(body);
-
-                // waiting for 2 seconds before trying to access palletArray
+                // waiting for 2 seconds before trying to access palletArray and moving it forward
                 setTimeout(function() {
                     var length = Object.keys(palletArray).length;
                     iidee = palletArray[Object.keys(palletArray)[length-1]];
                     try { updatePalletInformation(iidee.rfid, information);
-                    } catch (TypeError) {
-                        console.log("check simulator events");
-                    }
-                }, 2000);
-
-                // after two seconds we are also transzoning the loaded pallet from 3 to 5
-                setTimeout(function() {
-                    request.post('http://localhost:3000/RTU/SimCNV7/services/TransZone35',
-                        {form: {destUrl: "http://localhost:" + port}}, function (err, httpResponse, body) {
-                            if (err) {
-                                console.log(err);
-                            }
-                        })
+                    } catch (TypeError) { console.log("check simulator events!"); }
+                    movePallet(35); // move the loaded pallet to the WS8
                 }, 2000);
             }
         });
 }
 
 function invokePalletUnloading() {
+
+    console.log("Storing pallet");
+
     request.post('http://localhost:3000/RTU/SimROB7/services/UnloadPallet',
         {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
-            if(err) {
-                console.log(err);
-            }
+            if(err) { console.log(err); }
         });
 }
 
 function movePallet(zone) {
+
+    console.log("movePallet zone: " + zone);
 
     var options = {
         uri: "http://localhost:3000/RTU/SimCNV7/services/TransZone" + zone,
@@ -142,10 +139,8 @@ function movePallet(zone) {
     };
 
     request(options, function (error, response, body) {
-        if (!error) { //console.log(body);
-        }
-        else { //console.log('error');
-        }
+        if (error) { console.log(error);
+        } else { console.log(body); }
     });
 }
 
@@ -191,42 +186,45 @@ app.post('/', function(req, res){
 
         // Zone 1 event handling here
     } else if (req.body.id == 'Z1_Changed') {
-        //console.log(req.body);
+        movePallet(12);
+    } else if (req.body.id == 'Z2_Changed') {
+        movePallet(23);
+    } else if (req.body.id == 'Z3_Changed') {
+
         var key = req.body.payload.PalletID;
-        //console.log("Pallet " + key + " is at Zone 1 in " + req.body.senderID);
-        try {
-            //console.log("hasPaper: " + palletArray[key].hasPaper);
-            // jos ei paperi, ajetaan vaan kolmoselle saakka
-            // TODO: TESTAA UNLOAD ja käytä eventteja
-            if (palletArray[key].hasPaper == 0) {
-                movePallet(12);
-                setTimeout(function() {
-                    movePallet(23);
+        //console.log(key);
 
-                    setTimeout(function() {
+        // purkkaa, kun ei muutakaan keksi. poistetaan siis pallet viiden sekunnin päästä eventista
+
+            try {
+                console.log("Trying to identify recipe");
+                console.log("Frame: " + palletArray[key].frame);
+                console.log("Keyboard: " + palletArray[key].keyboard);
+                console.log("Screen: " + palletArray[key].screen);
+
+                if ((key != "-1")&&(palletArray[key].frame==0)&&(palletArray[key].screen==0)&&(palletArray[key].keyboard==0)){
+                    console.log("empty recipe, unloading in five seconds");
+
+                    setTimeout(function () {
+                        console.log("UNLOADING");
                         invokePalletUnloading();
-                    }, 3000);
+                    },5000);
 
-                }, 3000);
+                } else {
+                    console.log("Recipe not empty, passing through");
+                    movePallet(35); }
+
+            } catch (TypeError) {
+                console.log("Fucking -1");
             }
-            // TODO: use events, not timers
-            if (palletArray[key].hasPaper == 1) {
-                movePallet(12);
-                setTimeout(function() {
-                    movePallet(23);
-                    setTimeout(function() {
-                        movePallet(35);
-                    }, 3000);
-                }, 3000);
-            }
-        } catch (TypeError) {
-            //console.log("PalletID is probably -1");
-        }
-        res.write("Thank you for updating pallet information");
-        // unidentified posts
+
+
+
+
+
     } else {
        if (debugging) { console.log(req.body); }
-        res.write("oh snap");
+        res.write("unidentified POST");
     }
     res.end('\n Information Exhange Sequence End');
 });
@@ -257,3 +255,5 @@ http.listen(port, function(){
 subscribeToEvents();
 
 if (debugging == true) { setInterval(logJSON, 5000); }
+
+//setInterval(invokePalletUnloading, 10000);
