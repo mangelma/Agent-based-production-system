@@ -22,20 +22,11 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
 <!-- Sidebar menu -->
 <nav class="w3-sidebar w3-black w3-top" style="z-index:3;width:260px" align="center" id="mySidebar">
-    <div class="w3-container w3-display-container w3-padding-16">
+    <div class="w3-container w3-display-container w3-padding-16" id="agentphone">
         <h3>Agent Phone</h3>
         <h6>Ordering System</h6>
         <hr>
         <form enctype="application/json" id="orderForm">
-
-            <p><label> FRAME </label></p>
-
-            <select name="frame">
-                <option selected disabled>Model</option>
-                <option value="1" selected="selected">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-            </select>
 
             <select name="framecolor">
                 <option selected disabled>Color</option>
@@ -44,51 +35,63 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                 <option value="blue">Blue</option>
             </select>
 
-            <hr>
+            <label> FRAME </label>
 
-            <p><label> KEYBOARD </label></p>
-            <select name="keyboard">
+            <select name="frame">
                 <option selected disabled>Model</option>
-                <option value="1">1</option>
-                <option value="2" selected="selected">2</option>
+                <option value="1" selected="selected">1</option>
+                <option value="2">2</option>
                 <option value="3">3</option>
             </select>
 
-            <select name="keyboardcolor">
-                <option selected disabled>Color</option>
-                <option value="red">Red</option>
-                <option value="green" selected="selected">Green</option>
-                <option value="blue">Blue</option>
-            </select>
-
             <hr>
-
-            <p><label> SCREEN </label></p>
-            <select name="screen">
-                <option selected disabled>Model</option>
-                <option value="1" >1</option>
-                <option value="2">2</option>
-                <option value="3" selected="selected">3</option>
-            </select>
 
             <select name="screencolor">
                 <option selected disabled>Color</option>
                 <option value="red">Red</option>
-                <option value="green">Green</option>
+                <option value="green" selected="selected">Green</option>
+                <option value="blue" >Blue</option>
+            </select>
+            <label> SCREEN </label>
+            <select name="screen">
+                <option selected disabled>Model</option>
+                <option value="1" >1</option>
+                <option value="2" selected="selected">2</option>
+                <option value="3" >3</option>
+            </select>
+
+            <hr>
+
+            <select name="keyboardcolor">
+                <option selected disabled>Color</option>
+                <option value="red">Red</option>
+                <option value="green" >Green</option>
                 <option value="blue" selected="selected">Blue</option>
+            </select>
+            <label> KEYBOARD </label>
+            <select name="keyboard">
+                <option selected disabled>Model</option>
+                <option value="1">1</option>
+                <option value="2" >2</option>
+                <option value="3" selected="selected">3</option>
             </select>
 
             <hr>
 
             <p> <button class="w3-button w3-block w3-hover-green w3-teal w3-left-align" onclick="addToOrder()">
                 <i class="fa fa-check-square-o w3-margin-right"></i>Make Order!</button> </p>
+
+            <p> <button class="w3-button w3-block w3-hover-gray w3-black w3-left-align"
+                        onclick="easterEgg()">
+                 </button> </p>
+
         </form>
 
     </div>
 </nav>
 
 <!-- Right side thing -->
-<div class="w3-container" style="margin-left: 260px;max-width: 800px;" align="center">
+<div class="w3-container" style="margin-left: 260px;max-width: 800px;" align="center" id="centerthing">
 
     <!-- Table that visualises the order -->
     <div class="w3-responsive w3-card-4">
@@ -99,7 +102,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     <div class="w3-row">
         <div class="w3-col m6">
         <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:98.5%"
-                   onclick="clearOrders()" type="button" >clear</button></p>
+                   onclick="clearQueue()" type="button" >clear last</button></p>
         </div>
         <div class="w3-col m6">
         <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:98.5%"
@@ -107,15 +110,17 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
         </div>
     </div>
 
+    <hr>
 
-
-    <!-- Table that visualises the order -->
+    <!-- production -->
     <div class="w3-responsive w3-card-4" style="margin-top: 10px">
         <H1>Currently in Production:</H1>
         <p id="progressOrder">no production yet, make some.</p>
     </div>
 
-    <!-- Table that visualises the order -->
+    <hr>
+
+    <!-- finished -->
     <div class="w3-responsive w3-card-4" style="margin-top: 10px">
         <H1>Finished:</H1>
         <p id="progressOrder">no finished yet, make some.</p>
@@ -129,6 +134,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
 </div>
 
+<!-- SCRIPT SCRIPT SCRIPT SCRIPT SCRIPT SCRIPT SCRIPT SCRIPT SCRIPT -->
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
@@ -139,13 +145,22 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
     orderArray = [];
 
-    function clearOrders() {
-        orderArray = [];
-        document.getElementById("showOrder").innerHTML = "orders cleared";
+
+
+    function clearQueue() {
+        orderArray.pop();
+        //document.getElementById("showOrder").innerHTML = "orders cleared";
+        document.getElementById("showOrder").innerHTML = orderArray;
+    }
+
+    function moveToProd() {
+        orderArray[orderArray.length-1];
+        orderArray.pop();
+        document.getElementById("progressOrder").innerHTML = orderArray[orderArray.length-1];
+        document.getElementById("showOrder").innerHTML = orderArray;
     }
 
     function addToOrder() {
-
         var order =
             { "id" : "PlaceOrder",
                 "Information" :
@@ -162,9 +177,6 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                     }
             };
 
-        console.log("tilaus vastaanotettu: ");
-        //console.log(order);
-
         $(function () {
             var socket = io();
             $('form').submit(function(){
@@ -173,29 +185,31 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                 order = 0;
                 return false;
             });
-
             socket.on('emitOrder', function(msg){
                 //console.log("Socket.io emit received: " + msg);
                 //console.log(JSON.stringify(msg));
-                orderString = msg.Information.fcolor + " frame " + msg.Information.frame +
-                + " kalja " + msg.Information.scolor + " screen " + msg.Information.screen +
-                + " siideri " + msg.Information.kcolor + " keyboard " + msg.Information.keyboard;
+                orderString = msg.Information.fcolor +
+                    " frame " +
+                    msg.Information.frame.toString() +
+                ", " +
+                    msg.Information.scolor +
+                    " screen " +
+                    msg.Information.screen.toString() +
+                 ", " +
+                    msg.Information.kcolor +
+                    " keyboard " +
+                    msg.Information.keyboard.toString() +
+                "<br>";
 
                 orderArray.push(orderString);
 
                 document.getElementById("showOrder").innerHTML = orderArray;
                 //$('#messages').append($('<li>').text(msg));
             });
-
         });
-
-
     }
 
-
-
-
-
+    function easterEgg(){document.getElementById("centerthing").innerHTML="<h1>fantasy<br>can<br>fly</h1>";document.getElementById("agentphone").innerHTML="<h1>FIS<br>to<br>the<br>core</h1>";}
 
 </script>
 
