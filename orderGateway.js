@@ -34,20 +34,27 @@ app.get('/', function(req, res){
 
 // Socket.io magic happens here
 io.on('connection', function(socket){
+
     socket.on('chat message', function(order){
-        if (order != "0") { send(order); console.log("Order: "); console.log(order); }
+        if (order != "0") {
+            send(order);
+            console.log("Order: ");
+            console.log(order);
+            io.emit('emitOrder', order);
+        }
     });
 });
 
 // POSTs handled here, no functionality yet
 app.post('/', function(req, res){
     //console.log(req.body);
-    tilaus = req.body;
-    console.log(tilaus);
+    //tilaus = req.body;
+    //console.log(tilaus);
     res.end('\n ordering system received information');
 });
 
 
+// for debugging, not actually needed
 function subscribeToEvents() {
 
     request.post('http://localhost:3000/RTU/SimCNV8/events/Z1_Changed/notifs',
@@ -78,4 +85,4 @@ function subscribeToEvents() {
         });
 }
 
-subscribeToEvents();
+//subscribeToEvents();

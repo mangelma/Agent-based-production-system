@@ -8,7 +8,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 <head>
     <meta charset="UTF-8">
     <title>FIS Core with Socket.io</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=2">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -20,15 +20,15 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
 <body>
 
-<!-- Menu -->
-<nav class="w3-sidebar w3-light-grey w3-top" style="z-index:3;width:260px" id="mySidebar">
+<!-- Sidebar menu -->
+<nav class="w3-sidebar w3-black w3-top" style="z-index:3;width:260px" align="center" id="mySidebar">
     <div class="w3-container w3-display-container w3-padding-16">
-        <h3>Order Phones</h3>
-        <h6>You can add multiple products</h6>
+        <h3>Agent Phone</h3>
+        <h6>Ordering System</h6>
         <hr>
         <form enctype="application/json" id="orderForm">
 
-            <p><label><i class="fa fa-mobile-phone"></i> Frame Options</label></p>
+            <p><label> FRAME </label></p>
 
             <select name="frame">
                 <option selected disabled>Model</option>
@@ -44,7 +44,9 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                 <option value="blue">Blue</option>
             </select>
 
-            <p><label><i class="fa fa-mobile-phone"></i> Keyboard Options</label></p>
+            <hr>
+
+            <p><label> KEYBOARD </label></p>
             <select name="keyboard">
                 <option selected disabled>Model</option>
                 <option value="1">1</option>
@@ -59,7 +61,9 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                 <option value="blue">Blue</option>
             </select>
 
-            <p><label><i class="fa fa-mobile-phone"></i> Screen Options</label></p>
+            <hr>
+
+            <p><label> SCREEN </label></p>
             <select name="screen">
                 <option selected disabled>Model</option>
                 <option value="1" >1</option>
@@ -74,17 +78,57 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                 <option value="blue" selected="selected">Blue</option>
             </select>
 
-            <p><label><i class="fa fa-mobile-phone"></i> Amount</label></p>
-            <input class="w3-input w3-border" type="number" value="1" min="1" max="99">
+            <hr>
 
-            <p> <button class="w3-button w3-block w3-green w3-left-align" onclick="addToOrder()">
-                <i class="fa fa-check-square-o w3-margin-right"></i> Add to Order!</button> </p>
+            <p> <button class="w3-button w3-block w3-hover-green w3-teal w3-left-align" onclick="addToOrder()">
+                <i class="fa fa-check-square-o w3-margin-right"></i>Make Order!</button> </p>
         </form>
-
-        <p><a href="" class="w3-button w3-block w3-blue w3-left-align"><i class="fa fa-history w3-margin-right"></i> Track Orders</a></p>
 
     </div>
 </nav>
+
+<!-- Right side thing -->
+<div class="w3-container" style="margin-left: 260px;max-width: 800px;" align="center">
+
+    <!-- Table that visualises the order -->
+    <div class="w3-responsive w3-card-4">
+        <H1>Order Queue:</H1>
+        <p id="showOrder">no orders yet, make some.</p>
+    </div>
+
+    <div class="w3-row">
+        <div class="w3-col m6">
+        <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:98.5%"
+                   onclick="clearOrders()" type="button" >clear</button></p>
+        </div>
+        <div class="w3-col m6">
+        <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:98.5%"
+                   onclick="moveToProd()" type="button" >move to production</button></p>
+        </div>
+    </div>
+
+
+
+    <!-- Table that visualises the order -->
+    <div class="w3-responsive w3-card-4" style="margin-top: 10px">
+        <H1>Currently in Production:</H1>
+        <p id="progressOrder">no production yet, make some.</p>
+    </div>
+
+    <!-- Table that visualises the order -->
+    <div class="w3-responsive w3-card-4" style="margin-top: 10px">
+        <H1>Finished:</H1>
+        <p id="progressOrder">no finished yet, make some.</p>
+    </div>
+
+
+    <footer class="w3-container w3-padding-16" style="margin-top:32px">Powered by
+        <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS"
+           target="_blank" class="w3-hover-text-green">w3.css</a>,
+        implementation by @masse_ 2017</footer>
+
+</div>
+
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
@@ -92,6 +136,13 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
     // TODO: tyhjennä välimuisti aina tilauksen jälkeen tms
     // nyt lähtee niin monta tilausta kun nappia on painettu tms
+
+    orderArray = [];
+
+    function clearOrders() {
+        orderArray = [];
+        document.getElementById("showOrder").innerHTML = "orders cleared";
+    }
 
     function addToOrder() {
 
@@ -112,7 +163,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             };
 
         console.log("tilaus vastaanotettu: ");
-        console.log(order);
+        //console.log(order);
 
         $(function () {
             var socket = io();
@@ -122,6 +173,20 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                 order = 0;
                 return false;
             });
+
+            socket.on('emitOrder', function(msg){
+                //console.log("Socket.io emit received: " + msg);
+                //console.log(JSON.stringify(msg));
+                orderString = msg.Information.fcolor + " frame " + msg.Information.frame +
+                + " kalja " + msg.Information.scolor + " screen " + msg.Information.screen +
+                + " siideri " + msg.Information.kcolor + " keyboard " + msg.Information.keyboard;
+
+                orderArray.push(orderString);
+
+                document.getElementById("showOrder").innerHTML = orderArray;
+                //$('#messages').append($('<li>').text(msg));
+            });
+
         });
 
 
