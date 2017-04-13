@@ -25,6 +25,25 @@ function send(order) {
     });
 }
 
+function pollSimulator() {
+    request.get({
+        url: 'http://localhost:3000/RTU/CNV7/data/S1'
+    }, function(error, response, body){
+        //console.log(body);
+        if (error) {
+            var fault = error.code;
+            console.log(fault);
+            io.emit('simulatorState', fault);
+            //throw TypeError ("Simulator is offline, please come next year");
+        } else {
+            //console.log("simulator is alive");
+            io.emit('simulatorState', "OK");
+        }
+    });
+}
+
+setInterval(pollSimulator, 5000);
+
 // listening to port 4099
 http.listen(port, function(){
     console.log('The order gateway is listening to ' + port);

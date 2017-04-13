@@ -1,4 +1,3 @@
-
 <!--
 Made by using a template from https://www.w3schools.com/w3css/w3css_templates.asp
 -->
@@ -8,13 +7,49 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 <head>
     <meta charset="UTF-8">
     <title>FIS Core with Socket.io</title>
-    <meta name="viewport" content="width=device-width, initial-scale=2">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", Arial, Helvetica, sans-serif}
-        .mySlides {display:none}
+
+         .connectedclass {
+             background-color: green;
+             z-index: 3;
+             width: 260px;
+             align: center
+             height:100%;
+             width:200px;
+             position:fixed!important;
+             z-index:1;
+             overflow:auto;
+             top:0;
+             bottom:0;
+         }
+
+        .faultclass {
+            background-color: red;
+            z-index: 3;
+            width: 260px;
+            align: center
+            height:100%;
+            width:200px;
+            position:fixed!important;
+            z-index:1;
+            overflow:auto;
+            top:0;
+            bottom:0;
+        }
+
+        .easterconnected {
+            background-color: green;
+        }
+
+        .easterfault {
+            background-color: red;
+        }
+
     </style>
 </head>
 
@@ -25,6 +60,8 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     <div class="w3-container w3-display-container w3-padding-16" id="agentphone">
         <h3>Agent Phone</h3>
         <h6>Ordering System</h6>
+        <h7>Status:</h7>
+        <element id="simStatus">initializing...</element>
         <hr>
         <form enctype="application/json" id="orderForm">
             <select name="framecolor">
@@ -84,7 +121,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 </nav>
 
 <!-- Queue, prod, finished -->
-<div class="w3-container" style="margin-left: 260px;max-width: 800px;" align="center" id="centerthing">
+<div class="w3-container" style="margin-left: 260px;" align="center" id="centerthing">
 
     <!-- Table that visualises the order -->
     <div class="w3-responsive w3-card-4">
@@ -229,7 +266,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             console.log("Clearing queue");
             orderArray.pop();
             //document.getElementById("showOrder").innerHTML = "order cleared";
-            document.getElementById("showOrder").innerHTML = orderArray;
+            document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
         }
 
         // HERE THE ACTUAL REQUEST TO PRODUCTION
@@ -269,6 +306,35 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             finishedArray.push(JSON.stringify(msg));
             document.getElementById("progressOrder").innerHTML = "order finished";
             document.getElementById("finishedOrders").innerHTML = finishedArray;
+        });
+
+        // FINISHED
+        socket.on('simulatorState', function(msg){
+            console.log("Socket.io state: " + msg);
+            console.log(document.getElementById("mySidebar"));
+
+            document.getElementById("simStatus").innerHTML = JSON.stringify(msg);
+
+            // changing sidebar color
+            if (msg == "OK") {
+                //document.getElementById("simStatus").style.backgroundColor = "green";
+                document.getElementById("mySidebar").setAttribute("class", "connectedclass");
+                document.getElementById("easterEgg").setAttribute("class", "easterconnected");
+
+
+                setTimeout(function(){
+                    document.getElementById("mySidebar").setAttribute("class", "w3-sidebar w3-black w3-top");
+                }, 2500);
+
+            } else {
+                //document.getElementById("simStatus").style.backgroundColor = "red";
+                document.getElementById("mySidebar").setAttribute("class", "faultclass");
+                document.getElementById("easterEgg").setAttribute("class", "easterfault");
+
+                setTimeout(function(){
+                    document.getElementById("mySidebar").setAttribute("class", "w3-sidebar w3-black w3-top");
+                }, 2500);
+            }
         });
 
 
