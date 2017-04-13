@@ -8,7 +8,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var port = 4107; // port for listening
 var palletArray = {}; // JSON for storing pallets and orders on them
-var debugging = true;
+
+//var debugging = true;
+var debugging = false;
 
 function subscribeToEvents() {
 
@@ -140,7 +142,8 @@ function movePallet(zone) {
 
     request(options, function (error, response, body) {
         if (error) { console.log(error);
-        } else { console.log(body); }
+        } else { //console.log(body);
+            }
     });
 }
 
@@ -211,6 +214,11 @@ app.post('/', function(req, res){
                 if ((key != "-1")&&(palletArray[key].frame==0)&&(palletArray[key].screen==0)&&(palletArray[key].keyboard==0)){
                     console.log("empty recipe, unloading in five seconds");
 
+
+                    console.log(palletArray[key]);
+                    sendInfo(palletArray[key], 4099);
+                    delete palletArray[key];
+
                     setTimeout(function () {
                         console.log("UNLOADING");
                         invokePalletUnloading();
@@ -236,7 +244,8 @@ app.post('/', function(req, res){
 });
 
 app.post('/order', function(req, res){
-    console.log(req.body.id + " received!");
+    //console.log(req);
+    //console.log(req.body.id + " received!");
 
     if (req.body.id == 'PlaceOrder') {
         var information = req.body.Information;
@@ -250,6 +259,13 @@ app.post('/order', function(req, res){
         console.log("/order received unidentifiend post message with body: " + req.body);
         res.write("what the fuck? send proper POSTs");
     }
+    res.end('\n Order Received');
+});
+
+app.post('/debug', function(req, res){
+
+
+    console.log(req);
     res.end('\n Order Received');
 });
 

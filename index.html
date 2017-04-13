@@ -20,32 +20,28 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
 <body>
 
-<!-- Sidebar menu -->
+<!-- Sidebar menu, osat ja värit täällä -->
 <nav class="w3-sidebar w3-black w3-top" style="z-index:3;width:260px" align="center" id="mySidebar">
     <div class="w3-container w3-display-container w3-padding-16" id="agentphone">
         <h3>Agent Phone</h3>
         <h6>Ordering System</h6>
         <hr>
         <form enctype="application/json" id="orderForm">
-
             <select name="framecolor">
                 <option selected disabled>Color</option>
                 <option value="red" selected="selected">Red</option>
                 <option value="green">Green</option>
                 <option value="blue">Blue</option>
             </select>
-
             <label> FRAME </label>
-
             <select name="frame">
                 <option selected disabled>Model</option>
+                <option value="0">0</option>
                 <option value="1" selected="selected">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
             </select>
-
             <hr>
-
             <select name="screencolor">
                 <option selected disabled>Color</option>
                 <option value="red">Red</option>
@@ -55,13 +51,12 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             <label> SCREEN </label>
             <select name="screen">
                 <option selected disabled>Model</option>
+                <option value="0">0</option>
                 <option value="1" >1</option>
                 <option value="2" selected="selected">2</option>
                 <option value="3" >3</option>
             </select>
-
             <hr>
-
             <select name="keyboardcolor">
                 <option selected disabled>Color</option>
                 <option value="red">Red</option>
@@ -71,26 +66,24 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             <label> KEYBOARD </label>
             <select name="keyboard">
                 <option selected disabled>Model</option>
+                <option value="0">0</option>
                 <option value="1">1</option>
                 <option value="2" >2</option>
                 <option value="3" selected="selected">3</option>
             </select>
-
             <hr>
 
-            <p> <button class="w3-button w3-block w3-hover-green w3-teal w3-left-align" onclick="addToOrder()">
-                <i class="fa fa-check-square-o w3-margin-right"></i>Make Order!</button> </p>
+            <p> <button class="w3-button w3-block w3-hover-green w3-teal w3-left-align" id="addToQueue">
+                Add to Queue</button> </p>
 
-            <p> <button class="w3-button w3-block w3-hover-gray w3-black w3-left-align"
-                        onclick="easterEgg()">
-                 </button> </p>
+            <p> <button class="w3-button w3-block w3-hover-gray w3-black" id="easterEgg"></button> </p>
 
         </form>
 
     </div>
 </nav>
 
-<!-- Right side thing -->
+<!-- Queue, prod, finished -->
 <div class="w3-container" style="margin-left: 260px;max-width: 800px;" align="center" id="centerthing">
 
     <!-- Table that visualises the order -->
@@ -101,12 +94,12 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
     <div class="w3-row">
         <div class="w3-col m6">
-        <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:98.5%"
-                   onclick="clearQueue()" type="button" >clear last</button></p>
+            <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:98.5%"
+                       id="clearQueue" type="button" >clear last</button></p>
         </div>
         <div class="w3-col m6">
-        <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:98.5%"
-                   onclick="moveToProd()" type="button" >move to production</button></p>
+            <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:98.5%"
+                       id="moveToProd" type="button" >move to production</button></p>
         </div>
     </div>
 
@@ -123,7 +116,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     <!-- finished -->
     <div class="w3-responsive w3-card-4" style="margin-top: 10px">
         <H1>Finished:</H1>
-        <p id="progressOrder">no finished yet, make some.</p>
+        <p id="finishedOrders">no finished yet, make some.</p>
     </div>
 
 
@@ -140,77 +133,150 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 <script>
 
-    // TODO: tyhjennä välimuisti aina tilauksen jälkeen tms
-    // nyt lähtee niin monta tilausta kun nappia on painettu tms
+    // not sure how jQuery works, but we are still using it
+    $(document).ready(function(){
 
-    orderArray = [];
+        // initializing variables and array for showing orders
+        orderArray = [];
+        finishedArray = [];
+        var order = 0;
+        var j = 0;
+        var socket = io();
 
+        document.getElementById("easterEgg").addEventListener("click", easterEgg, false);
+        document.getElementById("clearQueue").addEventListener("click", clearQueue, false);
+/*
+        // ADD TO QUEUE, NOT TO PRODUCTION YET
+        function addToQueue() {
+            console.log("Adding to queue");
+            order =
+                { "id" : "PlaceOrder",
+                    "Information" :
+                        {
+                            "frame" : document.getElementsByName("frame")[0].value,
+                            "screen" : document.getElementsByName("screen")[0].value,
+                            "keyboard" : document.getElementsByName("keyboard")[0].value,
+                            "fcolor" : document.getElementsByName("framecolor")[0].value,
+                            "scolor" : document.getElementsByName("screencolor")[0].value,
+                            "kcolor" : document.getElementsByName("keyboardcolor")[0].value,
+                            "destination": 0,
+                            "hasPaper" : 0,
+                            "rfid" : 0 // will be initialized once the pallet is loaded
+                        }
+                };
 
+            //console.log(order);
+            //orderArray.push(JSON.stringify(order));
 
-    function clearQueue() {
-        orderArray.pop();
-        //document.getElementById("showOrder").innerHTML = "orders cleared";
-        document.getElementById("showOrder").innerHTML = orderArray;
-    }
-
-    function moveToProd() {
-        orderArray[orderArray.length-1];
-        orderArray.pop();
-        document.getElementById("progressOrder").innerHTML = orderArray[orderArray.length-1];
-        document.getElementById("showOrder").innerHTML = orderArray;
-    }
-
-    function addToOrder() {
-        var order =
-            { "id" : "PlaceOrder",
-                "Information" :
-                    {
-                        "frame" : document.getElementsByName("frame")[0].value,
-                        "screen" : document.getElementsByName("screen")[0].value,
-                        "keyboard" : document.getElementsByName("keyboard")[0].value,
-                        "fcolor" : document.getElementsByName("framecolor")[0].value,
-                        "scolor" : document.getElementsByName("screencolor")[0].value,
-                        "kcolor" : document.getElementsByName("keyboardcolor")[0].value,
-                        "destination": 0,
-                        "hasPaper" : 0,
-                        "rfid" : 0 // will be initialized once the pallet is loaded
-                    }
-            };
-
-        $(function () {
-            var socket = io();
-            $('form').submit(function(){
-                socket.emit('chat message', order);
-                //$(order).val('');
-                order = 0;
-                return false;
-            });
             socket.on('emitOrder', function(msg){
-                //console.log("Socket.io emit received: " + msg);
-                //console.log(JSON.stringify(msg));
+                j++;
+                console.log(j + "Socket.io PROD received: " + msg);
+                console.log(JSON.stringify(msg));
+
                 orderString = msg.Information.fcolor +
                     " frame " +
                     msg.Information.frame.toString() +
-                ", " +
+                    ", " +
                     msg.Information.scolor +
                     " screen " +
                     msg.Information.screen.toString() +
-                 ", " +
+                    ", " +
                     msg.Information.kcolor +
                     " keyboard " +
                     msg.Information.keyboard.toString() +
-                "<br>";
+                    "<br>";
+                if (j == 1) {
+                    orderArray.push(orderString);
+                }
 
-                orderArray.push(orderString);
 
                 document.getElementById("showOrder").innerHTML = orderArray;
+                console.log(orderArray);
                 //$('#messages').append($('<li>').text(msg));
             });
+
+
+        }
+*/
+        // this is important, dont fuck up. actually queueForm
+        $('#orderForm').submit(function(){
+            console.log("Queuing...");
+            order =
+                { "id" : "PlaceOrder",
+                    "Information" :
+                        {
+                            "frame" : document.getElementsByName("frame")[0].value,
+                            "screen" : document.getElementsByName("screen")[0].value,
+                            "keyboard" : document.getElementsByName("keyboard")[0].value,
+                            "fcolor" : document.getElementsByName("framecolor")[0].value,
+                            "scolor" : document.getElementsByName("screencolor")[0].value,
+                            "kcolor" : document.getElementsByName("keyboardcolor")[0].value,
+                            "destination": 0,
+                            "hasPaper" : 0,
+                            "rfid" : 0 // will be initialized once the pallet is loaded
+                        }
+                };
+
+            orderArray.push(order);
+            document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
+            console.log("orderArray updated");
+            return false;
         });
-    }
 
-    function easterEgg(){document.getElementById("centerthing").innerHTML="<h1>fantasy<br>can<br>fly</h1>";document.getElementById("agentphone").innerHTML="<h1>FIS<br>to<br>the<br>core</h1>";}
 
+        // FOR CANCELLING ORDERS
+        function clearQueue() {
+            console.log("Clearing queue");
+            orderArray.pop();
+            //document.getElementById("showOrder").innerHTML = "order cleared";
+            document.getElementById("showOrder").innerHTML = orderArray;
+        }
+
+        // HERE THE ACTUAL REQUEST TO PRODUCTION
+        $('#moveToProd').click(function(){
+            console.log("Moving to prod");
+            //console.log(JSON.stringify(order));
+
+            var orderToSent = orderArray[orderArray.length-1];
+
+            console.log("orderToSent: " + orderToSent);
+            console.log("last order stored in var: " + order);
+
+            socket.emit('moveToProd', orderToSent);
+            //$(order).val('');
+
+            //document.getElementById("showOrder").innerHTML = "processing...";
+
+            //order = 0;
+
+            //orderArray[orderArray.length-1];
+
+            // remove from queue
+            orderArray.pop();
+
+            // currently in production:
+            document.getElementById("progressOrder").innerHTML = JSON.stringify(orderToSent);
+
+            // update queue array
+            document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
+
+            return false;
+        });
+
+        // FINISHED
+        socket.on('finishedOrder', function(msg){
+            console.log("Socket.io finished: " + msg);
+            finishedArray.push(JSON.stringify(msg));
+            document.getElementById("progressOrder").innerHTML = "order finished";
+            document.getElementById("finishedOrders").innerHTML = finishedArray;
+        });
+
+
+        // frustration released here
+        function easterEgg(){document.getElementById("centerthing").innerHTML="<h1>fantasy<br>can<br>fly</h1>";document.getElementById("agentphone").innerHTML="<h1>FIS<br>to<br>the<br>core</h1>";}
+
+
+    });
 </script>
 
 </body>

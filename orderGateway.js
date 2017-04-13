@@ -11,6 +11,10 @@ var tilaus;
 
 // JSON-order is sent here
 function send(order) {
+
+    console.log("sending:");
+    console.log(order);
+
     request.post({
         headers: { "content-type" : "application/json" },
         url: 'http://localhost:4107/order',
@@ -32,22 +36,67 @@ app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
 
+var i = 0;
+
 // Socket.io magic happens here
 io.on('connection', function(socket){
 
-    socket.on('chat message', function(order){
+    socket.on('moveToProd', function(order){
+
+        console.log("MovetoProd socket io received");
+        console.log(order);
+
         if (order != "0") {
+            i++;
             send(order);
-            console.log("Order: ");
-            console.log(order);
-            io.emit('emitOrder', order);
+            console.log("Order: " + i);
+            //io.emit('emitOrder', order);
+
         }
     });
+
+    socket.on('queue', function(order){
+
+        console.log("Queue socket io received, not executing anything. Should I do something?");
+        //console.log(order);
+/*
+        if (order != "0") {
+            i++;
+            send(order);
+            console.log("Order: " + i);
+
+            setTimeout(function() {
+                io.emit('emitOrder', order);
+            },1000);
+
+        } */
+    });
+
 });
 
 // POSTs handled here, no functionality yet
 app.post('/', function(req, res){
-    //console.log(req.body);
+    console.log("order ready?");
+    console.log(req.body);
+
+    var finished = req.body.rfid +
+            ", " +
+        req.body.fcolor +
+            " " +
+        req.body.frame +
+            ", " +
+        req.body.scolor +
+        " " +
+        req.body.screen +
+            ", " +
+        req.body.kcolor +
+            " " +
+        req.body.keyboard;
+
+    console.log(finished);
+
+    io.emit('finishedOrder', finished);
+
     //tilaus = req.body;
     //console.log(tilaus);
     res.end('\n ordering system received information');
