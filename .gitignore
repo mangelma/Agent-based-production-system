@@ -1,5 +1,6 @@
 /.idea/workspace.xml
 *.xml
+/node_modules/
 
 # Windows image file caches
 Thumbs.db
