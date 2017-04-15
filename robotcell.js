@@ -473,7 +473,7 @@ Robotcell.prototype.UpdatePalletInformation = function (recept, destination, ID)
 
 
 // muuttaa palletin reseptiä ja destinatiota
-    var uprecept =recept.split(",")
+    var uprecept = recept.split(",")
 
     var options = {
         uri: fastIP+':4107',

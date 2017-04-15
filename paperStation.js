@@ -1,6 +1,7 @@
 /**
  * Created by Weckström on 8.4.2017.
  */
+
 var app = require('express')();
 var http = require('http').Server(app);
 var request = require('request');
@@ -9,27 +10,16 @@ var replaceall = require('replaceall');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var port = 4101;
-var palletArray = {};
-var serverBasePort = 4000 // Base port plus cellnumber
 var fastIP = 'http://localhost'
-var myIP = 'http://localhost'
 
 http.listen(port, function(){
   console.log('The Agent WS1 is listening in ' + port);
   console.log('\n');
 });
 
-// Agent WS1
-var LoadingCell = function LoadingCell() {
-  this.place = 1;
-  this.job = 5; // 1 screen, 2 keyboard, 3 frame, 4 load/unload, 5 paper in/out
-//this.palletArray = [];
-};
-
 // Aika kauheen näkönen, jäi alkucopypasteista... Voin muokata, jos tarvitsee
 function subscribeToEvents() {
-  // initialize also the WS1 here
-  //WS7.init();
+
   console.log("Subscribed to PaperLoaded!");
   request.post('http://localhost:3000/RTU/SimROB1/events/PaperLoaded/notifs',
     {form:{destUrl:"http://localhost:" + port}}, function(err,httpResponse,body){
@@ -134,7 +124,7 @@ function UpdatePalletInformation (recipe, paperBool, destination, ID) {
     if (!error && response.statusCode == 200) {
       //console.log(body.id) // Print the shortened url.
     }
-    console.log(response.body);
+    //console.log(response.body);
   });
 };
 
@@ -144,7 +134,7 @@ app.post('/', function(req, res) {
 
     // Parse incoming POST message body
     var data = JSON.stringify(req.body)
-    console.log(data);
+    //console.log(data);
     data = replaceall("{", "", data)
     data = replaceall("}", "", data)
     data = replaceall('"', "", data)
@@ -164,24 +154,18 @@ app.post('/', function(req, res) {
     else if ((req.body.id == 'Z2_Changed') && (req.body.payload.PalletID != -1)) {
       TransZone("23");
     }
-    else if ((req.body.id == 'Z3_Changed') && (req.body.payload.PalletID != -1)) {
+    else if ((req.body.id == 'Z3_Changed') && (req.body.payload.PalletID != -1) &&
+        (datatable[1] != '0') && (datatable[3] != '0') && (datatable[5] != '0')) {
       GetPalletInformation(req.body.payload.PalletID); // Pallet status?
-    }
-    // Pallet without paper
-    else if ((datatable[14] == 'hasPaper') && (datatable[15] == '0')){
       console.log("Pallet without paper, loading a piece...");
       LoadPaper();
       UpdatePalletInformation(recipe,'1','2',datatable[17]); // Update pallet information, destination always 2
     }
     // Check if product on pallet is finished
-    else if((datatable[14] == 'hasPaper') && (datatable[15] == '1')) {
-      if ((datatable[1] == '0') && (datatable[3] == '0') && (datatable[5] == '0')) {
+    else if((datatable[1] == '0') && (datatable[3] == '0') && (datatable[5] == '0')) {
         console.log('Product ready, removing...');
         UnloadPaper();
         UpdatePalletInformation(recipe, '0', '2', datatable[17]);
-      } else {
-        TransZone('35');
-      }
     }
     // Transfer pallet from WS1 to WS2 after loading/unloading
     else if((req.body.id == 'PaperLoaded') || (req.body.id == 'PaperUnloaded')){
