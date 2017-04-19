@@ -2,9 +2,9 @@
 NodeJS based assignment work for the TUT course Distributed Automation Systems
 
 Use:
--Start the FASTory simulator first
--runTheSystem.bat 
--open http://localhost:4099/ to make orders
+*Start the FASTory simulator first
+*runTheSystem.bat 
+*open http://localhost:4099/ to make orders
 
 ```javascript
 // orderInterface.js can be used to send this message
