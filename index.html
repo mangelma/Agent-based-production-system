@@ -14,6 +14,21 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     <style>
         body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", Arial, Helvetica, sans-serif}
 
+        .loader {
+            visibility: hidden;
+            border: 16px solid #f3f3f3; /* Light grey */
+            border-top: 16px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .connectedclass {
             background-color: green;
             z-index: 3;
@@ -116,7 +131,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             <hr>
 
             <p> <button class="w3-button w3-block w3-hover-green w3-teal w3-left-align" id="addToQueue">
-                Add to Queue</button> </p>
+                Add to Basket</button> </p>
 
             <p> <button class="w3-button w3-block w3-hover-gray w3-black" id="easterEgg"></button> </p>
 
@@ -136,7 +151,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             <table class="w3-table w3-striped w3-bordered" id="orderTable">
                 <thead>
                 <tr class="w3-theme">
-                    <th colspan="3"><h3>Products</h3></th>
+                    <th colspan="3" id="ProductsQueue"><h3>Products</h3> </div></th>
                 </tr>
                 <tr class="w3-theme">
                     <td><b>ProductID</b></td>
@@ -153,6 +168,8 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     </div>
 
 
+
+
     <div class="w3-row">
 
         <div class="w3-col m6">
@@ -165,10 +182,11 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                        id="clearBasket" type="button" >Clear Basket</button></p>
         </div>
 
-
     </div>
 
     <hr>
+
+<div class="loader" id="loader"></div>
 
     <!-- production -->
     <div class="w3-responsive w3-card-4" style="margin-top: 10px">
@@ -178,11 +196,15 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
     <hr>
 
+
+
+
     <!-- finished -->
     <div class="w3-responsive w3-card-4" style="margin-top: 10px">
         <H1>Finished:</H1>
         <p id="finishedOrders">no finished yet, make some.</p>
     </div>
+
 
 
     <footer class="w3-container w3-padding-16" style="margin-top:32px">Powered by
@@ -200,6 +222,9 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     // not sure how jQuery works, but we are still using it
     $(document).ready(function(){
         // initializing variables and array for showing orders
+        document.getElementById("moveToProd").disabled = true;
+        document.getElementById("clearBasket").disabled = true;
+        //document.getElementById("loader").style.visibility = "hidden";
         orderArray = [];
         finishedArray = [];
         var order = 0;
@@ -228,9 +253,19 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                             "rfid" : 0 // will be initialized once the pallet is loaded
                         }
                 };
+
+            // pushing JSON order into orderArray
             orderArray.push(order);
             //document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
+
+            // enabling buttons
+            document.getElementById("moveToProd").disabled = false;
+            document.getElementById("clearBasket").disabled = false;
+
+            // calling visualization function
             addToOrder();
+
+            // returning
             console.log("orderArray updated");
             return false;
         });
@@ -245,17 +280,14 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             // clearing the visualized basket
             $("#tbody").empty();
 
+            document.getElementById("moveToProd").disabled = true;
+            document.getElementById("clearBasket").disabled = true;
+
 
             //document.getElementById("progressOrder").innerHTML =
 
             //document.getElementById("showOrder").innerHTML = "order cleared";
             //document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
-        }
-
-
-        function deleteProduct(r) {
-            var i = r.parentNode.parentNode.rowIndex;
-            document.getElementById("tbody").deleteRow(i-2);
         }
 
 
@@ -291,19 +323,28 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
         // HERE THE ACTUAL REQUEST TO PRODUCTION
         $('#moveToProd').click(function(){
             console.log("Moving to prod");
+
+            document.getElementById("moveToProd").disabled = true;
+            document.getElementById("clearBasket").disabled = true;
+            document.getElementById("addToQueue").disabled = true;
+
+            document.getElementById("ProductsQueue").innerHTML = "<h3>Production Queue</h3>";
+            document.getElementById("loader").style.visibility = "visible";
+
+
             //console.log(JSON.stringify(order));
-            var orderToSent = orderArray[orderArray.length-1];
-            //console.log("orderToSent: " + orderToSent);
-            //console.log("last order stored in var: " + order);
-            socket.emit('moveToProd', orderToSent);
+            //var orderToSent = orderArray[orderArray.length-1];
+
+            // transferring order to gateway via socket.io
+            socket.emit('moveToProd', orderArray);
             //$(order).val('');
             //document.getElementById("showOrder").innerHTML = "processing...";
             //order = 0;
             //orderArray[orderArray.length-1];
             // remove from queue
-            orderArray.pop();
+            //orderArray.pop();
             // currently in production:
-            document.getElementById("progressOrder").innerHTML = JSON.stringify(orderToSent);
+            //document.getElementById("progressOrder").innerHTML = JSON.stringify(orderToSent);
             // update queue array
             //document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
             return false;
