@@ -14,20 +14,19 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     <style>
         body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", Arial, Helvetica, sans-serif}
 
-         .connectedclass {
-             background-color: green;
-             z-index: 3;
-             width: 260px;
-             align: center
-             height:100%;
-             width:200px;
-             position:fixed!important;
-             z-index:1;
-             overflow:auto;
-             top:0;
-             bottom:0;
-         }
-
+        .connectedclass {
+            background-color: green;
+            z-index: 3;
+            width: 260px;
+            align: center
+            height:100%;
+            width:200px;
+            position:fixed!important;
+            z-index:1;
+            overflow:auto;
+            top:0;
+            bottom:0;
+        }
         .faultclass {
             background-color: red;
             z-index: 3;
@@ -41,15 +40,12 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             top:0;
             bottom:0;
         }
-
         .easterconnected {
             background-color: green;
         }
-
         .easterfault {
             background-color: red;
         }
-
     </style>
 </head>
 
@@ -58,8 +54,8 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 <!-- Sidebar menu, osat ja värit täällä -->
 <nav class="w3-sidebar w3-black w3-top" style="z-index:3;width:260px" align="center" id="mySidebar">
     <div class="w3-container w3-display-container w3-padding-16" id="agentphone">
-        <h3>Agent Phone</h3>
-        <h6>Ordering System</h6>
+        <h3>Factory Information</h3>
+        <h3>System</h3>
         <h7>Status:</h7>
         <element id="simStatus">initializing...</element>
         <hr>
@@ -100,7 +96,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                 <option value="green" >Green</option>
                 <option value="blue" selected="selected">Blue</option>
             </select>
-            <label> KEYBOARD </label>
+            <label> KEYB </label>
             <select name="keyboard">
                 <option selected disabled>Model</option>
                 <option value="0">0</option>
@@ -108,6 +104,15 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                 <option value="2" >2</option>
                 <option value="3" selected="selected">3</option>
             </select>
+            <hr>
+            <label><i class="fa fa-mobile-phone"></i> Amount</label>
+            <select name="amount">
+                <option selected disabled>Amount</option>
+                <option value="1" selected="selected">1</option>
+                <option value="2" >2</option>
+                <option value="3">3</option>
+            </select>
+
             <hr>
 
             <p> <button class="w3-button w3-block w3-hover-green w3-teal w3-left-align" id="addToQueue">
@@ -123,21 +128,44 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 <!-- Queue, prod, finished -->
 <div class="w3-container" style="margin-left: 260px;" align="center" id="centerthing">
 
-    <!-- Table that visualises the order -->
-    <div class="w3-responsive w3-card-4">
-        <H1>Order Queue:</H1>
-        <p id="showOrder">no orders yet, make some.</p>
+    <div class="w3-container w3-white" style="min-width: 500px;
+                                            max-width: 1000px; width: auto">
+
+        <!-- Table that visualises the order -->
+        <div class="w3-responsive w3-card-4">
+            <table class="w3-table w3-striped w3-bordered" id="orderTable">
+                <thead>
+                <tr class="w3-theme">
+                    <th colspan="3"><h3>Products</h3></th>
+                </tr>
+                <tr class="w3-theme">
+                    <td><b>ProductID</b></td>
+                    <td style="width: 20%"><b>Amount</b></td>
+                    <td style="width: 10%"></td>
+                </tr>
+                </thead>
+                <tbody id="tbody">
+
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
+
     <div class="w3-row">
+
+        <div class="w3-col m6">
+            <p><button class="w3-btn w3-block w3-green w3-padding-large" style="width:98.5%"
+                       id="moveToProd" type="button" >Submit Order</button></p>
+        </div>
+
         <div class="w3-col m6">
             <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:98.5%"
-                       id="clearQueue" type="button" >clear last</button></p>
+                       id="clearBasket" type="button" >Clear Basket</button></p>
         </div>
-        <div class="w3-col m6">
-            <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:98.5%"
-                       id="moveToProd" type="button" >move to production</button></p>
-        </div>
+
+
     </div>
 
     <hr>
@@ -169,75 +197,22 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 <script>
-
     // not sure how jQuery works, but we are still using it
     $(document).ready(function(){
-
         // initializing variables and array for showing orders
         orderArray = [];
         finishedArray = [];
         var order = 0;
         var j = 0;
         var socket = io();
-
         document.getElementById("easterEgg").addEventListener("click", easterEgg, false);
-        document.getElementById("clearQueue").addEventListener("click", clearQueue, false);
-/*
-        // ADD TO QUEUE, NOT TO PRODUCTION YET
-        function addToQueue() {
-            console.log("Adding to queue");
-            order =
-                { "id" : "PlaceOrder",
-                    "Information" :
-                        {
-                            "frame" : document.getElementsByName("frame")[0].value,
-                            "screen" : document.getElementsByName("screen")[0].value,
-                            "keyboard" : document.getElementsByName("keyboard")[0].value,
-                            "fcolor" : document.getElementsByName("framecolor")[0].value,
-                            "scolor" : document.getElementsByName("screencolor")[0].value,
-                            "kcolor" : document.getElementsByName("keyboardcolor")[0].value,
-                            "destination": 0,
-                            "hasPaper" : 0,
-                            "rfid" : 0 // will be initialized once the pallet is loaded
-                        }
-                };
+        document.getElementById("clearBasket").addEventListener("click", clearQueue, false);
+        //document.getElementById("clearQueue").addEventListener("click", deleteProduct, false);
 
-            //console.log(order);
-            //orderArray.push(JSON.stringify(order));
-
-            socket.on('emitOrder', function(msg){
-                j++;
-                console.log(j + "Socket.io PROD received: " + msg);
-                console.log(JSON.stringify(msg));
-
-                orderString = msg.Information.fcolor +
-                    " frame " +
-                    msg.Information.frame.toString() +
-                    ", " +
-                    msg.Information.scolor +
-                    " screen " +
-                    msg.Information.screen.toString() +
-                    ", " +
-                    msg.Information.kcolor +
-                    " keyboard " +
-                    msg.Information.keyboard.toString() +
-                    "<br>";
-                if (j == 1) {
-                    orderArray.push(orderString);
-                }
-
-
-                document.getElementById("showOrder").innerHTML = orderArray;
-                console.log(orderArray);
-                //$('#messages').append($('<li>').text(msg));
-            });
-
-
-        }
-*/
         // this is important, dont fuck up. actually queueForm
         $('#orderForm').submit(function(){
-            console.log("Queuing...");
+            //console.log("Queuing...");
+
             order =
                 { "id" : "PlaceOrder",
                     "Information" :
@@ -253,50 +228,84 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                             "rfid" : 0 // will be initialized once the pallet is loaded
                         }
                 };
-
             orderArray.push(order);
-            document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
+            //document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
+            addToOrder();
             console.log("orderArray updated");
             return false;
         });
 
-
         // FOR CANCELLING ORDERS
         function clearQueue() {
             console.log("Clearing queue");
-            orderArray.pop();
+
+            // emptying the array
+            orderArray = [];
+
+            // clearing the visualized basket
+            $("#tbody").empty();
+
+
+            //document.getElementById("progressOrder").innerHTML =
+
             //document.getElementById("showOrder").innerHTML = "order cleared";
-            document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
+            //document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
         }
+
+
+        function deleteProduct(r) {
+            var i = r.parentNode.parentNode.rowIndex;
+            document.getElementById("tbody").deleteRow(i-2);
+        }
+
+
+        function addToOrder() {
+
+            //Generates and validates the productId
+            var productId = "F" + document.getElementsByName("frame")[0].value + document.getElementsByName("framecolor")[0].value +
+                "K" + document.getElementsByName("keyboard")[0].value + document.getElementsByName("keyboardcolor")[0].value +
+                "S" + document.getElementsByName("screen")[0].value + document.getElementsByName("screencolor")[0].value;
+
+            var check1 = productId.search("Model");
+            var check2 = productId.search("Color");
+
+            if (check1 == -1 && check2 == -1) {
+
+                var table = document.getElementById("tbody");
+                var amount = document.getElementsByName("amount")[0].value;
+                var row = table.insertRow(-1);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                //var cell3 = row.insertCell(2);
+
+                cell1.innerHTML = productId;
+                cell2.innerHTML = amount;
+                //cell3.innerHTML = '<button class="w3-button w3-circle w3-tiny w3-red" type="button" onclick="deleteProduct(this)"><b>X</b></button>';
+
+                document.getElementById("orderForm").reset();
+            }
+
+        }
+
 
         // HERE THE ACTUAL REQUEST TO PRODUCTION
         $('#moveToProd').click(function(){
             console.log("Moving to prod");
             //console.log(JSON.stringify(order));
-
             var orderToSent = orderArray[orderArray.length-1];
-
-            console.log("orderToSent: " + orderToSent);
-            console.log("last order stored in var: " + order);
-
+            //console.log("orderToSent: " + orderToSent);
+            //console.log("last order stored in var: " + order);
             socket.emit('moveToProd', orderToSent);
             //$(order).val('');
-
             //document.getElementById("showOrder").innerHTML = "processing...";
-
             //order = 0;
-
             //orderArray[orderArray.length-1];
-
             // remove from queue
             orderArray.pop();
-
             // currently in production:
             document.getElementById("progressOrder").innerHTML = JSON.stringify(orderToSent);
-
             // update queue array
-            document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
-
+            //document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
             return false;
         });
 
@@ -308,40 +317,30 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             document.getElementById("finishedOrders").innerHTML = finishedArray;
         });
 
-        // FINISHED
+        // Status monitor
         socket.on('simulatorState', function(msg){
-            console.log("Socket.io state: " + msg);
-            console.log(document.getElementById("mySidebar"));
-
+            //console.log("Socket.io state: " + msg);
+            //console.log(document.getElementById("mySidebar"));
             document.getElementById("simStatus").innerHTML = JSON.stringify(msg);
-
             // changing sidebar color
             if (msg == "OK") {
                 //document.getElementById("simStatus").style.backgroundColor = "green";
                 document.getElementById("mySidebar").setAttribute("class", "connectedclass");
                 document.getElementById("easterEgg").setAttribute("class", "easterconnected");
-
-
-                setTimeout(function(){
-                    document.getElementById("mySidebar").setAttribute("class", "w3-sidebar w3-black w3-top");
-                }, 2500);
-
+                //setTimeout(function(){
+                    document.getElementById("mySidebar").setAttribute("connectedclass", "w3-sidebar w3-green w3-top");
+                //}, 2500);
             } else {
                 //document.getElementById("simStatus").style.backgroundColor = "red";
                 document.getElementById("mySidebar").setAttribute("class", "faultclass");
                 document.getElementById("easterEgg").setAttribute("class", "easterfault");
-
-                setTimeout(function(){
-                    document.getElementById("mySidebar").setAttribute("class", "w3-sidebar w3-black w3-top");
-                }, 2500);
+                //setTimeout(function(){
+                    document.getElementById("mySidebar").setAttribute("faultclass", "w3-sidebar w3-red w3-top");
+                //}, 2500);
             }
         });
-
-
         // frustration released here
         function easterEgg(){document.getElementById("centerthing").innerHTML="<h1>fantasy<br>can<br>fly</h1>";document.getElementById("agentphone").innerHTML="<h1>FIS<br>to<br>the<br>core</h1>";}
-
-
     });
 </script>
 
