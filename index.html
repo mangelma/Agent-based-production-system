@@ -18,10 +18,19 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             visibility: hidden;
             border: 16px solid #f3f3f3; /* Light grey */
             border-top: 16px solid #3498db; /* Blue */
+            border-bottom: 16px solid;
             border-radius: 50%;
             width: 120px;
             height: 120px;
             animation: spin 2s linear infinite;
+        }
+
+        .stateClass {
+            color: gray;
+            font-style: bold;
+            font-size: 40px;
+            font-family: "Raleway", Arial, Helvetica, sans-serif
+
         }
 
         @keyframes spin {
@@ -71,8 +80,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     <div class="w3-container w3-display-container w3-padding-16" id="agentphone">
         <h3>Factory Information</h3>
         <h3>System</h3>
-        <h7>Status:</h7>
-        <element id="simStatus">initializing...</element>
+
         <hr>
         <form enctype="application/json" id="orderForm">
             <select name="framecolor">
@@ -130,8 +138,11 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
             <hr>
 
-            <p> <button class="w3-button w3-block w3-hover-green w3-teal w3-left-align" id="addToQueue">
+            <p> <button class="w3-button w3-block w3-hover-green w3-teal" id="addToQueue">
                 Add to Basket</button> </p>
+
+            <a href="http://localhost:4099"
+               class="w3-button w3-block w3-hover-green w3-blue">Reset UI</a>
 
             <p> <button class="w3-button w3-block w3-hover-gray w3-black" id="easterEgg"></button> </p>
 
@@ -168,8 +179,6 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     </div>
 
 
-
-
     <div class="w3-row">
 
         <div class="w3-col m6">
@@ -186,7 +195,13 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
     <hr>
 
+
+<h3>Production Line Status:</h3>
+<element id="simStatus" class="stateClass"><h1>initializing line...</h1></element>
 <div class="loader" id="loader"></div>
+
+
+<hr>
 
     <!-- production -->
     <div class="w3-responsive w3-card-4" style="margin-top: 10px">
@@ -195,8 +210,6 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     </div>
 
     <hr>
-
-
 
 
     <!-- finished -->
@@ -238,10 +251,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
         $('#orderForm').submit(function(){
             //console.log("Queuing...");
 
-            order =
-                { "id" : "PlaceOrder",
-                    "Information" :
-                        {
+            order = {
                             "frame" : document.getElementsByName("frame")[0].value,
                             "screen" : document.getElementsByName("screen")[0].value,
                             "keyboard" : document.getElementsByName("keyboard")[0].value,
@@ -251,11 +261,23 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                             "destination": 0,
                             "hasPaper" : 0,
                             "rfid" : 0 // will be initialized once the pallet is loaded
-                        }
-                };
+                        };
+
+            //console.log(document.getElementsByName("amount")[0].value);
+
+            var thisAmount = document.getElementsByName("amount")[0].value;
+
+           // console.log(thisAmount);
 
             // pushing JSON order into orderArray
-            orderArray.push(order);
+            for(i=1;i<=thisAmount;i++) {
+                console.log("Amount: " + i);
+                orderArray.push(order);
+            }
+
+
+            document.getElementById("progressOrder").innerHTML = JSON.stringify(orderArray);
+
             //document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
 
             // enabling buttons
@@ -284,7 +306,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             document.getElementById("clearBasket").disabled = true;
 
 
-            //document.getElementById("progressOrder").innerHTML =
+            document.getElementById("progressOrder").innerHTML = orderArray;
 
             //document.getElementById("showOrder").innerHTML = "order cleared";
             //document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
@@ -327,6 +349,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             document.getElementById("moveToProd").disabled = true;
             document.getElementById("clearBasket").disabled = true;
             document.getElementById("addToQueue").disabled = true;
+            document.getElementById("simStatus").innerHTML = "BUSY";
 
             document.getElementById("ProductsQueue").innerHTML = "<h3>Production Queue</h3>";
             document.getElementById("loader").style.visibility = "visible";
