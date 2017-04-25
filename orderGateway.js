@@ -54,11 +54,13 @@ function releaseNext() {
 
     //console.log(tilaus);
 
-    send(tilaus[tilaus.length-1]);
-    tilaus.pop();
-
-
-    console.log("next released");
+    if (tilaus.length >= 1) {
+        send(tilaus[tilaus.length-1]);
+        tilaus.pop();
+        console.log("next released");
+    } else {
+        console.log("empty queue")
+    }
     //console.log(tilaus);
 }
 
@@ -138,29 +140,12 @@ io.on('connection', function(socket){
 app.post('/', function(req, res){
     console.log("order ready?");
     console.log(req.body);
+    io.emit('finishedOrder', req.body);
 
-    var finished = req.body.rfid +
-            ", " +
-        req.body.fcolor +
-            " " +
-        req.body.frame +
-            ", " +
-        req.body.scolor +
-        " " +
-        req.body.screen +
-            ", " +
-        req.body.kcolor +
-            " " +
-        req.body.keyboard;
+    setTimeout(function() {
+        releaseNext();
+    }, 3000);
 
-    console.log(finished);
-
-    io.emit('finishedOrder', finished);
-
-    releaseNext();
-
-    //tilaus = req.body;
-    //console.log(tilaus);
     res.end('\n ordering system received information');
 });
 

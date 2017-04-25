@@ -84,7 +84,7 @@ function updatePalletInformation(iidee, updatedInfo) {
     } else {
         updatedInfo["rfid"] = iidee;
         if (debugging) { console.log("updatedInfo : " + JSON.stringify(updatedInfo)) }
-        palletArray[iidee] = updatedInfo;
+            palletArray[iidee] = updatedInfo;
     }
 }
 
@@ -178,7 +178,6 @@ app.post('/', function(req, res){
         updatePalletArray(key, initPallet);
         res.write("\n Thank you for loading a pallet");
 
-
         // Workcells are updating recipe and destination during the process
     } else if (req.body.id == 'UpdatePalletInformation') {
         var key = req.body.PalletID;
@@ -213,28 +212,25 @@ app.post('/', function(req, res){
 
                 if ((key != "-1")&&(palletArray[key].frame==0)&&(palletArray[key].screen==0)&&(palletArray[key].keyboard==0)){
                     console.log("empty recipe, unloading in five seconds");
-
-
                     console.log(palletArray[key]);
+
+                    // sending finished to gateway, this also releases next
                     sendInfo(palletArray[key], 4099);
-                    delete palletArray[key];
 
                     setTimeout(function () {
                         console.log("UNLOADING");
                         invokePalletUnloading();
-                    },5000);
+                    },2000);
+
+                    delete palletArray[key];
 
                 } else {
-                    console.log("Recipe not empty, passing through");
+                    //console.log("Recipe not empty, passing through");
                     movePallet(35); }
 
             } catch (TypeError) {
-                console.log("Fucking -1");
+                //console.log("Fucking -1");
             }
-
-
-
-
 
     } else {
        if (debugging) { console.log(req.body); }
@@ -247,16 +243,17 @@ app.post('/order', function(req, res){
     //console.log(req);
     //console.log(req.body.id + " received!");
 
-    if (req.body.id == 'PlaceOrder') {
-        var information = req.body.Information;
-        console.log("Making order with information " + JSON.stringify(information));
+    if (req.body != "") {
+        var information = req.body;
+        //console.log("Making order with information " + JSON.stringify(information));
         //updatePalletInformation(key, information);
         invokePalletLoading(information);
 
         res.write("Thank you for placing order");
 
     } else {
-        console.log("/order received unidentifiend post message with body: " + req.body);
+        console.log("unidentified");
+
         res.write("what the fuck? send proper POSTs");
     }
     res.end('\n Order Received');
