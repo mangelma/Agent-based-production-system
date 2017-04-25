@@ -101,6 +101,21 @@ function sendInfo(message, portti) {
     });
 }
 
+function updateCurrent(message) {
+    console.log("sending updated information to gateway");
+    console.log(palletArray);
+    //message = JSON.stringify(message);
+    //console.log("Sending information " + message);
+    request.post({
+        headers: {'content-type' : 'application/json'},
+        url: 'http://localhost:4099/update',
+        form: message
+    }, function(error, response, body){
+        //console.log(body);
+        if (error) { console.log(error); }
+    });
+}
+
 function invokePalletLoading(information) {
     console.log("Invoking pallet loading and waiting for 2 seconds");
     request.post('http://localhost:3000/RTU/SimROB7/services/LoadPallet',
@@ -163,6 +178,7 @@ app.post('/', function(req, res){
         requestedid = palletArray[req.body.palletInfo];
         sendInfo(requestedid, portti);
         logJSON(); // log the recipe every time palletInfo is asked
+        updateCurrent(requestedid);
         res.write("\n Thank you for asking pallet info");
 
         // pallet loaded event
@@ -267,7 +283,7 @@ app.post('/debug', function(req, res){
 });
 
 http.listen(port, function(){
-    console.log('The Agent WS7 is listening in ' + port);
+    console.log('The LoadStoreStation is listening in ' + port);
     console.log('\n');
 });
 

@@ -64,7 +64,6 @@ function releaseNext() {
     //console.log(tilaus);
 }
 
-
 function pollSimulator() {
     request.get({
         url: 'http://localhost:3000/RTU/CNV7/data/S1'
@@ -148,5 +147,15 @@ app.post('/', function(req, res){
 
     res.end('\n ordering system received information');
 });
+
+// POSTs handled here, no functionality yet
+app.post('/update', function(req, res){
+    console.log("/update received post with body: ");
+    console.log(req.body);
+    io.emit('updateOrder', req.body);
+    res.end('\n updating...');
+});
+
+
 
 setInterval(pollSimulator, 5000);
