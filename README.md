@@ -10,6 +10,7 @@ NodeJS based assignment work for the TUT course Distributed Automation Systems
 ***
 
 Made by Max Angelma, Antti Kotala & Niklas Weckström
+Modified to another assignment by Max Angelma, Ville Suoraniemi & Riikka Peura
 Spring 2017
 
 [![YouTubeVid](https://img.youtube.com/vi/BYvh2pmD-44/0.jpg)](https://www.youtube.com/watch?v=BYvh2pmD-44)
