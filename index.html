@@ -275,7 +275,8 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             }
 
 
-            document.getElementById("progressOrder").innerHTML = JSON.stringify(orderArray);
+            //document.getElementById("progressOrder").innerHTML = JSON.stringify(orderArray);
+            document.getElementById("progressOrder").innerHTML = "initializing order...";
 
             //document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
 
@@ -303,8 +304,6 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
             document.getElementById("moveToProd").disabled = true;
             document.getElementById("clearBasket").disabled = true;
-
-
             document.getElementById("progressOrder").innerHTML = orderArray;
 
             //document.getElementById("showOrder").innerHTML = "order cleared";
@@ -323,26 +322,17 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             var check2 = productId.search("Color");
 
             if (check1 == -1 && check2 == -1) {
-
                 var table = document.getElementById("tbody");
                 var amount = document.getElementsByName("amount")[0].value;
-
                 for (var r = 0, n = table.rows.length; r < n; r++) {
-
                     for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
-
                         var check3 = table.rows[r].cells[c].innerHTML;
-
                         if (check3 == productId){
-
                             table.rows[r].cells[1].innerHTML = parseInt(table.rows[r].cells[1].innerHTML) + parseInt(amount);
                             document.getElementById("orderForm").reset();
                             return;
-
                         }
-
                     }
-
                 }
 
                 var row = table.insertRow(-1);
@@ -394,17 +384,40 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
         // FINISHED
         socket.on('finishedOrder', function(msg){
             console.log("Socket.io finished: " + msg);
-            finishedArray.push(JSON.stringify(msg));
-            document.getElementById("progressOrder").innerHTML = "order finished";
+
+            finishedArray.push(JSON.stringify(orderArray[orderArray.length-1]));
+            orderArray.pop();
+
+            document.getElementById("progressOrder").innerHTML = "All products finished";
             document.getElementById("finishedOrders").innerHTML = finishedArray;
         });
 
 
         // Updated
         socket.on('updateOrder', function(msg){
-            console.log("Socket.io updated: " + JSON.stringify(msg));
-            finishedArray.push(JSON.stringify(msg));
-            document.getElementById("progressOrder").innerHTML = JSON.stringify(msg);
+            //console.log("Socket.io updated: " + JSON.stringify(msg));
+            //console.log(msg.frame)
+
+            var tuloste = "Frame: "
+                + msg.fcolor
+                +  " "
+                + msg.frame
+                + ", screen: "
+                + msg.scolor
+                +  " "
+                + msg.screen
+                + ", keyboard: "
+                + msg.kcolor
+                +  " "
+                + msg.keyboard
+                + ", next destination: "
+                + msg.destination
+                + ", palletID: "
+                + msg.rfid;
+
+
+            //finishedArray.push(JSON.stringify(msg));
+            document.getElementById("progressOrder").innerHTML = tuloste;
             //document.getElementById("finishedOrders").innerHTML = finishedArray;
         });
 
@@ -430,6 +443,11 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                 //}, 2500);
             }
         });
+
+        if (document.getElementById("progressOrder").innerHTML == "All products finished") {
+            document.getElementById("loader").style.visibility = "hidden";
+        }
+
         // frustration released here
         function easterEgg(){document.getElementById("centerthing").innerHTML="<h1>fantasy<br>can<br>fly</h1>";document.getElementById("agentphone").innerHTML="<h1>FIS<br>to<br>the<br>core</h1>";}
     });
