@@ -206,7 +206,9 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     <!-- production -->
     <div class="w3-responsive w3-card-4" style="margin-top: 10px">
         <H1>Currently in Production:</H1>
-        <p id="progressOrder">no production yet, make some.</p>
+        <p id="progressOrder">Waiting for order...</p>
+        <H2>Remaining time:</H2>
+        <p id="remainingTime">Waiting for order...</p>
     </div>
 
     <hr>
@@ -232,6 +234,9 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 <script>
+
+    var remTim = 0;
+
     // not sure how jQuery works, but we are still using it
     $(document).ready(function(){
         // initializing variables and array for showing orders
@@ -352,12 +357,16 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
         // HERE THE ACTUAL REQUEST TO PRODUCTION
         $('#moveToProd').click(function(){
+
+            remTime = 100;
+
             console.log("Moving to prod");
 
             document.getElementById("moveToProd").disabled = true;
             document.getElementById("clearBasket").disabled = true;
             document.getElementById("addToQueue").disabled = true;
             document.getElementById("simStatus").innerHTML = "BUSY";
+            //document.getElementById("remainingTime").innerHTML = "97 seconds";
 
             document.getElementById("ProductsQueue").innerHTML = "<h3>Ordered Products</h3>";
             document.getElementById("loader").style.visibility = "visible";
@@ -422,6 +431,17 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
             //finishedArray.push(JSON.stringify(msg));
             document.getElementById("progressOrder").innerHTML = tuloste;
+
+            remTime = remTime-4;
+
+            if (remTime > 0) {
+                document.getElementById("remainingTime").innerHTML = remTime + " seconds";
+            } else {
+                document.getElementById("remainingTime").innerHTML = "Unloading...";
+            }
+
+
+
             //document.getElementById("finishedOrders").innerHTML = finishedArray;
         });
 
