@@ -65,6 +65,7 @@ function releaseNext() {
 }
 
 function pollSimulator() {
+
     request.get({
         url: 'http://localhost:3000/RTU/CNV7/data/S1'
     }, function(error, response, body){

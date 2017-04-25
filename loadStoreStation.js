@@ -170,15 +170,17 @@ function logJSON() {
 app.post('/', function(req, res){
     //console.log(req.body.id + " received!");
 
-    // Workcells are asking information about pallets
-    if (req.body.id == 'GetPalletInfo') {
+    // Workcells are asking iGetPalletInfonformation about pallets
+    if (req.body.id == '') {
         res.write("Hello Workcell");
         //res.write(JSON.stringify(req.body.palletInfo));
         portti = req.body.portti;
         requestedid = palletArray[req.body.palletInfo];
         sendInfo(requestedid, portti);
         logJSON(); // log the recipe every time palletInfo is asked
+
         updateCurrent(requestedid);
+
         res.write("\n Thank you for asking pallet info");
 
         // pallet loaded event

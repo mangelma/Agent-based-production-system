@@ -13,7 +13,6 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", Arial, Helvetica, sans-serif}
-
         .loader {
             visibility: hidden;
             border: 16px solid #f3f3f3; /* Light grey */
@@ -24,7 +23,6 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             height: 120px;
             animation: spin 2s linear infinite;
         }
-
         .stateClass {
             color: gray;
             font-style: bold;
@@ -32,12 +30,10 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             font-family: "Raleway", Arial, Helvetica, sans-serif
 
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
         .connectedclass {
             background-color: green;
             z-index: 3;
@@ -163,81 +159,63 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                 <thead>
                 <tr class="w3-theme">
                     <th colspan="3" id="ProductsQueue"><h3>Products</h3> </div></th>
-                </tr>
-                <tr class="w3-theme">
-                    <td><b>ProductID</b></td>
-                    <td style="width: 20%"><b>Amount</b></td>
-                    <td style="width: 10%"></td>
-                </tr>
-                </thead>
-                <tbody id="tbody">
+        </tr>
+        <tr class="w3-theme">
+            <td><b>ProductID</b></td>
+            <td style="width: 20%"><b>Amount</b></td>
+        </tr>
+        </thead>
+        <tbody id="tbody">
 
-                </tbody>
-            </table>
-        </div>
-
+        </tbody>
+        </table>
     </div>
 
-
-    <div class="w3-row">
-
-        <div class="w3-col m6">
-            <p><button class="w3-btn w3-block w3-green w3-padding-large" style="width:98.5%"
-                       id="moveToProd" type="button" >Submit Order</button></p>
-        </div>
-
-        <div class="w3-col m6">
-            <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:98.5%"
-                       id="clearBasket" type="button" >Clear Basket</button></p>
-        </div>
-
+    <div class="w3-col m6">
+        <p><button class="w3-btn w3-block w3-green w3-padding-large" style="width:50%"
+                   id="moveToProd" type="button" >Submit Order</button></p>
     </div>
 
-    <hr>
+    <div class="w3-col m6">
+        <p><button class="w3-btn w3-block w3-black w3-padding-large" style="width:50%"
+                   id="clearBasket" type="button" >Clear Basket</button></p>
+    </div>
 
+</div>
+
+<hr>
 
 <h3>Production Line Status:</h3>
 <element id="simStatus" class="stateClass"><h1>initializing line...</h1></element>
 <div class="loader" id="loader"></div>
 
+<hr>
+
+<!-- production -->
+<div class="w3-responsive w3-card-4" style="margin-top: 10px">
+    <H1>Currently in Production:</H1>
+    <p id="progressOrder">Waiting for order...</p>
+    <H3>Estimated Time Remaining:</H3>
+    <p id="remainingTime">Waiting for order...</p>
+</div>
 
 <hr>
 
-    <!-- production -->
-    <div class="w3-responsive w3-card-4" style="margin-top: 10px">
-        <H1>Currently in Production:</H1>
-        <p id="progressOrder">Waiting for order...</p>
-        <H2>Remaining time:</H2>
-        <p id="remainingTime">Waiting for order...</p>
-    </div>
-
-    <hr>
-
-
-    <!-- finished -->
-    <div class="w3-responsive w3-card-4" style="margin-top: 10px">
-        <H1>Finished:</H1>
-        <p id="finishedOrders">no finished yet, make some.</p>
-    </div>
-
-
-
-    <footer class="w3-container w3-padding-16" style="margin-top:32px">Powered by
-        <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS"
-           target="_blank" class="w3-hover-text-green">w3.css</a>,
-        implementation by @masse_ 2017</footer>
-
+<!-- finished -->
+<div class="w3-responsive w3-card-4" style="margin-top: 10px">
+    <H1>Finished:</H1>
+    <p id="finishedOrders">None yet, make some.</p>
 </div>
 
-<!-- SCRIPT SCRIPT SCRIPT SCRIPT SCRIPT SCRIPT SCRIPT SCRIPT SCRIPT -->
+<footer class="w3-container w3-padding-16" style="margin-top:32px">Powered by
+    <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS"
+       target="_blank" class="w3-hover-text-green">w3.css</a>,
+    implementation by @masse_ 2017</footer>
 
+</div>
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 <script>
-
-    var remTim = 0;
-
-    // not sure how jQuery works, but we are still using it
     $(document).ready(function(){
         // initializing variables and array for showing orders
         document.getElementById("moveToProd").disabled = true;
@@ -249,36 +227,30 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
         var socket = io();
         document.getElementById("easterEgg").addEventListener("click", easterEgg, false);
         document.getElementById("clearBasket").addEventListener("click", clearQueue, false);
-        //document.getElementById("clearQueue").addEventListener("click", deleteProduct, false);
 
         // this is important, dont fuck up. actually queueForm
         $('#orderForm').submit(function(){
             //console.log("Queuing...");
 
             order = {
-                            "frame" : document.getElementsByName("frame")[0].value,
-                            "screen" : document.getElementsByName("screen")[0].value,
-                            "keyboard" : document.getElementsByName("keyboard")[0].value,
-                            "fcolor" : document.getElementsByName("framecolor")[0].value,
-                            "scolor" : document.getElementsByName("screencolor")[0].value,
-                            "kcolor" : document.getElementsByName("keyboardcolor")[0].value,
-                            "destination": 0,
-                            "hasPaper" : 0,
-                            "rfid" : 0 // will be initialized once the pallet is loaded
-                        };
-
-            //console.log(document.getElementsByName("amount")[0].value);
+                "frame" : document.getElementsByName("frame")[0].value,
+                "screen" : document.getElementsByName("screen")[0].value,
+                "keyboard" : document.getElementsByName("keyboard")[0].value,
+                "fcolor" : document.getElementsByName("framecolor")[0].value,
+                "scolor" : document.getElementsByName("screencolor")[0].value,
+                "kcolor" : document.getElementsByName("keyboardcolor")[0].value,
+                "destination": 0,
+                "hasPaper" : 0,
+                "rfid" : 0 // will be initialized once the pallet is loaded
+            };
 
             var thisAmount = document.getElementsByName("amount")[0].value;
-
-           // console.log(thisAmount);
 
             // pushing JSON order into orderArray
             for(i=1;i<=thisAmount;i++) {
                 console.log("Amount: " + i);
                 orderArray.push(order);
             }
-
 
             //document.getElementById("progressOrder").innerHTML = JSON.stringify(orderArray);
             document.getElementById("progressOrder").innerHTML = "initializing order...";
@@ -300,21 +272,14 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
         // FOR CANCELLING ORDERS
         function clearQueue() {
             console.log("Clearing queue");
-
             // emptying the array
             orderArray = [];
-
             // clearing the visualized basket
             $("#tbody").empty();
-
             document.getElementById("moveToProd").disabled = true;
             document.getElementById("clearBasket").disabled = true;
             document.getElementById("progressOrder").innerHTML = orderArray;
-
-            //document.getElementById("showOrder").innerHTML = "order cleared";
-            //document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
         }
-
 
         function addToOrder() {
 
@@ -322,10 +287,8 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
             var productId = "F" + document.getElementsByName("frame")[0].value + document.getElementsByName("framecolor")[0].value +
                 "K" + document.getElementsByName("keyboard")[0].value + document.getElementsByName("keyboardcolor")[0].value +
                 "S" + document.getElementsByName("screen")[0].value + document.getElementsByName("screencolor")[0].value;
-
             var check1 = productId.search("Model");
             var check2 = productId.search("Color");
-
             if (check1 == -1 && check2 == -1) {
                 var table = document.getElementById("tbody");
                 var amount = document.getElementsByName("amount")[0].value;
@@ -339,72 +302,49 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                         }
                     }
                 }
-
                 var row = table.insertRow(-1);
                 var cell1 = row.insertCell(0);
                 var cell2 = row.insertCell(1);
-                var cell3 = row.insertCell(2);
-
                 cell1.innerHTML = productId;
                 cell2.innerHTML = amount;
-                //cell3.innerHTML = '<button class="w3-button w3-circle w3-tiny w3-red" type="button" onclick="deleteProduct(this)"><b>X</b></button>';
-
                 document.getElementById("orderForm").reset();
             }
 
         }
 
-
         // HERE THE ACTUAL REQUEST TO PRODUCTION
         $('#moveToProd').click(function(){
-
-            remTime = 100;
-
+            var table = document.getElementById("tbody");
+            var totalAmount = 0;
+            for (var r = 0, n = table.rows.length; r < n; r++){
+                var cellValue = parseInt(table.rows[r].cells[1].innerHTML);
+                totalAmount = totalAmount + cellValue;
+            }
+            remTime = 100 * totalAmount;
             console.log("Moving to prod");
-
             document.getElementById("moveToProd").disabled = true;
             document.getElementById("clearBasket").disabled = true;
             document.getElementById("addToQueue").disabled = true;
             document.getElementById("simStatus").innerHTML = "BUSY";
-            //document.getElementById("remainingTime").innerHTML = "97 seconds";
-
             document.getElementById("ProductsQueue").innerHTML = "<h3>Ordered Products</h3>";
             document.getElementById("loader").style.visibility = "visible";
-
-
-            //console.log(JSON.stringify(order));
-            //var orderToSent = orderArray[orderArray.length-1];
-
-            // transferring order to gateway via socket.io
             socket.emit('moveToProd', orderArray);
-            //$(order).val('');
-            //document.getElementById("showOrder").innerHTML = "processing...";
-            //order = 0;
-            //orderArray[orderArray.length-1];
-            // remove from queue
-            //orderArray.pop();
-            // currently in production:
-            //document.getElementById("progressOrder").innerHTML = JSON.stringify(orderToSent);
-            // update queue array
-            //document.getElementById("showOrder").innerHTML = JSON.stringify(orderArray);
             return false;
         });
 
         // FINISHED
         socket.on('finishedOrder', function(msg){
-            console.log("Socket.io finished: " + msg);
-
+            //console.log("Socket.io finished: " + msg);
             finishedArray.push(JSON.stringify(orderArray[orderArray.length-1]));
             orderArray.pop();
-
             if (orderArray.length == 0) {
                 document.getElementById("loader").style.visibility = "hidden";
+                $("#tbody").empty();
+                document.getElementById("addToQueue").disabled = false;
             }
-
             document.getElementById("progressOrder").innerHTML = "Product Finished";
             document.getElementById("finishedOrders").innerHTML = finishedArray;
         });
-
 
         // Updated
         socket.on('updateOrder', function(msg){
@@ -456,14 +396,14 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
                 document.getElementById("mySidebar").setAttribute("class", "connectedclass");
                 document.getElementById("easterEgg").setAttribute("class", "easterconnected");
                 //setTimeout(function(){
-                    document.getElementById("mySidebar").setAttribute("connectedclass", "w3-sidebar w3-green w3-top");
+                document.getElementById("mySidebar").setAttribute("connectedclass", "w3-sidebar w3-green w3-top");
                 //}, 2500);
             } else {
                 //document.getElementById("simStatus").style.backgroundColor = "red";
                 document.getElementById("mySidebar").setAttribute("class", "faultclass");
                 document.getElementById("easterEgg").setAttribute("class", "easterfault");
                 //setTimeout(function(){
-                    document.getElementById("mySidebar").setAttribute("faultclass", "w3-sidebar w3-red w3-top");
+                document.getElementById("mySidebar").setAttribute("faultclass", "w3-sidebar w3-red w3-top");
                 //}, 2500);
             }
         });
@@ -472,6 +412,5 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
         function easterEgg(){document.getElementById("centerthing").innerHTML="<h1>fantasy<br>can<br>fly</h1>";document.getElementById("agentphone").innerHTML="<h1>FIS<br>to<br>the<br>core</h1>";}
     });
 </script>
-
 </body>
 </html>
