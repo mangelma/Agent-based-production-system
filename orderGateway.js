@@ -34,28 +34,34 @@ function schedule(order) {
     console.log("scheduling execution");
     console.log("Order lenght: " + order.length);
     //console.log(order[0]);
-    testPrint(order);
-
-    for(var i=0;i<order.length;i++) {
-        setTimeout(testPrint, i*2000);
-    }
+    console.log(order);
 
     /*
-    request.post({
-        headers: { "content-type" : "application/json" },
-        url: 'http://localhost:4107/order',
-        json: order
-    }, function(error, response, body){
-        //console.log(body);
-        if (error) { console.log(error); }
-    });
+     request.post({
+     headers: { "content-type" : "application/json" },
+     url: 'http://localhost:4107/order',
+     json: order
+     }, function(error, response, body){
+     //console.log(body);
+     if (error) { console.log(error); }
+     });
 
-    */
+     */
 }
 
-function testPrint() {
-    console.log("fuck");
+function releaseNext() {
+    //console.log(tilaus);
+
+    //console.log(tilaus);
+
+    send(tilaus[tilaus.length-1]);
+    tilaus.pop();
+
+
+    console.log("next released");
+    //console.log(tilaus);
 }
+
 
 function pollSimulator() {
     request.get({
@@ -73,8 +79,6 @@ function pollSimulator() {
         }
     });
 }
-
-setInterval(pollSimulator, 5000);
 
 // listening to port 4099
 http.listen(port, function(){
@@ -101,7 +105,9 @@ io.on('connection', function(socket){
             i++;
             //send(order);
 
-            schedule(order);
+            tilaus = order;
+
+            releaseNext();
 
             //console.log("Order: " + i);
             //io.emit('emitOrder', order);
@@ -151,7 +157,11 @@ app.post('/', function(req, res){
 
     io.emit('finishedOrder', finished);
 
+    releaseNext();
+
     //tilaus = req.body;
     //console.log(tilaus);
     res.end('\n ordering system received information');
 });
+
+setInterval(pollSimulator, 5000);
