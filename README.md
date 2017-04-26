@@ -16,3 +16,5 @@ Modified to another assignment by Max Angelma, Ville Suoraniemi & Riikka Peura
 Spring 2017
 
 [![YouTubeVid](https://img.youtube.com/vi/BYvh2pmD-44/0.jpg)](https://www.youtube.com/watch?v=BYvh2pmD-44)
+
+[![YouTubeVid](https://img.youtube.com/vi/8osB51VR1PM/0.jpg)](https://www.youtube.com/watch?v=8osB51VR1PM)
