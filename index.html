@@ -12,6 +12,9 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
+        body {
+            font-size: 200%
+        }
         body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", Arial, Helvetica, sans-serif}
         .loader {
             visibility: hidden;
@@ -210,7 +213,8 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 <footer class="w3-container w3-padding-16" style="margin-top:32px">Powered by
     <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS"
        target="_blank" class="w3-hover-text-green">w3.css</a>,
-    implementation by @masse_ 2017</footer>
+    implementation by <a href="https://github.com/mangelma/Agent-based-production-system">
+        mangelma</a> 2017</footer>
 
 </div>
 <script src="/socket.io/socket.io.js"></script>
@@ -333,10 +337,34 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
         });
 
         // FINISHED
-        socket.on('finishedOrder', function(msg){
-            //console.log("Socket.io finished: " + msg);
-            finishedArray.push(JSON.stringify(orderArray[orderArray.length-1]));
+        socket.on('finishedOrder', function(recipe){
+            console.log("Ignoring the incoming recipe " + recipe);
+
+            var msg = orderArray[orderArray.length-1];
+
+            var tuloste = "Phone having "
+                + msg.fcolor
+                +  " frame "
+                + msg.frame
+                    + ", "
+                + msg.scolor
+                + " screen "
+                + msg.screen
+                + ", "
+                + msg.kcolor
+                + " keyboard "
+                + msg.keyboard
+                + "<br>";
+
+            console.log(tuloste);
+
+            // pushing the formatted product into finished
+            finishedArray.push(tuloste);
+
+            // remove finished order
             orderArray.pop();
+
+
             if (orderArray.length == 0) {
                 document.getElementById("loader").style.visibility = "hidden";
                 $("#tbody").empty();
@@ -350,6 +378,21 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
         socket.on('updateOrder', function(msg){
             //console.log("Socket.io updated: " + JSON.stringify(msg));
             //console.log(msg.frame)
+
+            if (msg.frame == 0) {
+                msg.frame = "completed";
+                msg.fcolor = "";
+            }
+
+            if (msg.screen == 0) {
+                msg.screen = "completed";
+                msg.scolor = "";
+            }
+
+            if (msg.keyboard == 0) {
+                msg.keyboard = "completed";
+                msg.kcolor = "";
+            }
 
             var tuloste = "Frame: "
                 + msg.fcolor
@@ -374,7 +417,7 @@ Made by using a template from https://www.w3schools.com/w3css/w3css_templates.as
 
             remTime = remTime-4;
 
-            if (remTime > 0) {
+            if (remTime >= 0) {
                 document.getElementById("remainingTime").innerHTML = remTime + " seconds";
             } else {
                 document.getElementById("remainingTime").innerHTML = "Unloading...";
